@@ -1,7 +1,6 @@
-
 import React from 'react';
 
-const Todo: React.FC = () => {
+const AddTask: React.FC = () => {
   return (
     <div>
       <h1>Todo Task List</h1>
@@ -10,4 +9,4 @@ const Todo: React.FC = () => {
   );
 }
 
-export default Todo;
+export default AddTask;

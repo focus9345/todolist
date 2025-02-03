@@ -4,7 +4,7 @@ interface Props {
   name: string;
 }
 
-const Navigation: React.FC<Props> = ({ name }) => {
+const TaskGroup: React.FC<Props> = ({ name }) => {
   return ( 
     <section>
         {name} 
@@ -12,4 +12,4 @@ const Navigation: React.FC<Props> = ({ name }) => {
 
 )};
 
-export default Navigation;
+export default TaskGroup;
