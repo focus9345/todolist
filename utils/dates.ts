@@ -1,30 +1,14 @@
 /** @file 
  * Helper file for date data
- * Get todays date UTC
- * Transform string date to UTC
- * Transform UTC to string date
- * Get difference between two dates
+ * Get todays date as a Date object
+ * Modify date object to display in different formats
+ * Get the difference between two dates in days
  */
 
 // This function will get the current date
-const currentDate = (): Date => {
+const todaysDate = (): Date => {
     return new Date();
 }
-
-// Transform String Date into Date
-const stringToDate = (date: string): Date => {
-    return new Date(date);
-}
-
-// Transform Date into string
-const displayDate = (date: Date): string => {
-    return date.toDateString();
-} 
-
-// Transform Date into UTC
-const storeDate = (date: Date): string => {
-    return date.toUTCString();
-} 
 
 // Get the difference between two dates in days
 function getDifferenceInDays(date1: Date, date2: Date): number {
@@ -33,11 +17,19 @@ function getDifferenceInDays(date1: Date, date2: Date): number {
     return diffDays;
 }
 
-// Find the difference between todays date and a given date in days
-const dateDifference = (date: Date): number => {
-    return getDifferenceInDays(currentDate(), date);
-}
+// Closure approach to modifying the date
+const dateModifier = (date: Date | string | number ) => {
+    const currentDate: Date = new Date(date);
+    const today: Date = todaysDate();
+    return {
+        dateString: () => currentDate.toDateString(), // Display date as string - Expected output: "Wed Jul 28 2020"
+        dateUTC: () => currentDate.toUTCString(), // Display date as UTC
+        dateObject: () => currentDate, // Display date as object
+        dateISO: () => currentDate.toISOString(), // Display date as ISO
+        dateLocale: () => currentDate.toLocaleDateString(), // Display date as locale
+        dateDifference: () => getDifferenceInDays(currentDate, today) // Get difference between two dates
+        };
+    }
 
-
-export { currentDate, stringToDate, displayDate, storeDate, dateDifference};
+export { todaysDate, dateModifier, getDifferenceInDays };
 
