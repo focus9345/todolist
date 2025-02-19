@@ -1,4 +1,6 @@
+'use client';
 import React from 'react';
+import {HeroUIProvider} from "@heroui/react";
 /**
  * A Primary Wrapper for Pages within the App.
  * 
@@ -12,11 +14,13 @@ interface RootLayoutProps {
 const PageWrapper: React.FC<RootLayoutProps> = ({ children }) => {
 
     return (
-        <main className="flex flex-col content-start gap-4 px-10 py-12 items-center justify-between">
-            <div className="w-full justify-start max-w-[1024px]">
+         <HeroUIProvider>
+        <div className="flex flex-col content-start gap-4 items-center justify-between">
+            <div className="w-full justify-start ">
                 {children}
             </div>
-        </main>
+        </div>
+        </HeroUIProvider>
     )
 }
 export default PageWrapper;

@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import {HeroUIProvider} from "@heroui/react";
+
 import Header from "../../layouts/header";
 import PageWrapper from "../../layouts/wrapper";
 import Footer from "../../layouts/footer";
 
 /**
  * A Primary Layout for the App.
- * 
+ *
  * @param {string} props.children - The text to display inside the button.
  */
 
@@ -38,16 +38,14 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <HeroUIProvider>
-          <PageWrapper>
-            <Header />
-              {children}
-        <Footer />
+        <PageWrapper>
+          <Header />
+          {children}
+          <Footer />
         </PageWrapper>
-        </HeroUIProvider>
       </body>
     </html>
   );
-}
+};
 
-export default RootLayout
+export default RootLayout;
