@@ -1,4 +1,5 @@
 import React from 'react';
+import Task from './task';
 /**
  * Groups that will hold tasks for categorization.
  * 
@@ -6,10 +7,12 @@ import React from 'react';
  */
 const Group: React.FC = () => {
     return (
-        <section className="">
-        <div className="p-10 border border-zinc-700 rounded-md">
-            groups
-        </div>
+        <section className="border border-zinc-700 rounded-md grid grid-rows gap-2 justify-center">
+        
+            <h3 className="text-center text-lg py-1">Group Name</h3>
+            <Task />
+            <Task />
+        
         </section>
     )
 }

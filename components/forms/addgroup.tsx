@@ -1,13 +1,17 @@
-import React from 'react';
-import {Form, Input, Button} from "@heroui/react";
+import React from "react";
+import { Form, Input, Button } from "@heroui/react";
+import { useFormStatus } from "react-dom";
+import FormSubmit from "./formsubmit";
 
 /**
- * A Primary Footer for the App.
- * 
- * 
+ * Component will add a new group.
+ *
+ *
  */
 const AddGroup: React.FC = () => {
-    const [submitted, setSubmitted] = React.useState<{ [k: string]: FormDataEntryValue } | null>(null);
+  const [submitted, setSubmitted] = React.useState<{
+    [k: string]: FormDataEntryValue;
+  } | null>(null);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,26 +20,28 @@ const AddGroup: React.FC = () => {
 
     setSubmitted(data);
   };
-    return (
-        <Form className="w-full max-w-xs" validationBehavior="native" onSubmit={onSubmit}>
+  return (
+    <Form
+      className="w-full max-w-xs"
+      validationBehavior="native"
+      onSubmit={onSubmit}
+    >
       <Input
         isRequired
-        errorMessage="Please enter a valid email"
-        label="Email"
+        errorMessage="Please enter a unique group name"
+        label="Goup Name"
         labelPlacement="outside"
-        name="email"
-        placeholder="Enter your email"
-        type="email"
+        name="groupname"
+        placeholder="Enter Group Name"
+        type="text"
       />
-      <Button type="submit" variant="bordered">
-        Submit
-      </Button>
+      <FormSubmit />
       {submitted && (
         <div className="text-small text-default-500">
           You submitted: <code>{JSON.stringify(submitted)}</code>
         </div>
       )}
     </Form>
-    )
-}
+  );
+};
 export default AddGroup;

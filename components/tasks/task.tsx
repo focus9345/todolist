@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import {Card, CardHeader, CardBody, CardFooter, Avatar, Button} from "@heroui/react";
 
@@ -9,7 +10,7 @@ import {Card, CardHeader, CardBody, CardFooter, Avatar, Button} from "@heroui/re
 const Task: React.FC = () => {
     const [isFollowed, setIsFollowed] = React.useState(false);
     return (
-        <Card className="max-w-[340px]">
+        <Card className="max-w-[340px] mb-5">
       <CardHeader className="justify-between">
         <div className="flex gap-5">
           <Avatar
