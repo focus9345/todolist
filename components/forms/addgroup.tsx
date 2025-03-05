@@ -19,7 +19,7 @@ const initialState: GroupFormState = {
 
 async function groupAction(prevState: GroupFormState, formData: FormData): Promise<GroupFormState> {
   // Existing group logic
-  const result = await groupAction(prevState, formData);
+  const result = await createGroup(prevState, formData);
   return {
     message: result?.message || "Success!",
   };
