@@ -1,13 +1,15 @@
-import React from 'react';
-import {Form, Input, Button} from "@heroui/react";
+import React from "react";
+import { Form, Input, Button } from "@heroui/react";
 
 /**
  * A Primary Footer for the App.
- * 
- * 
+ *
+ *
  */
 const AddTask: React.FC = () => {
-    const [submitted, setSubmitted] = React.useState<{ [k: string]: FormDataEntryValue } | null>(null);
+  const [submitted, setSubmitted] = React.useState<{
+    [k: string]: FormDataEntryValue;
+  } | null>(null);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,8 +18,12 @@ const AddTask: React.FC = () => {
 
     setSubmitted(data);
   };
-    return (
-        <Form className="w-full max-w-xs" validationBehavior="native" onSubmit={onSubmit}>
+  return (
+    <Form
+      className="w-full max-w-xs"
+      validationBehavior="native"
+      onSubmit={onSubmit}
+    >
       <Input
         isRequired
         errorMessage="Please enter a valid email"
@@ -36,6 +42,6 @@ const AddTask: React.FC = () => {
         </div>
       )}
     </Form>
-    )
-}
+  );
+};
 export default AddTask;

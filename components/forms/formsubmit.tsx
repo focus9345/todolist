@@ -6,7 +6,7 @@ import { Button } from "@heroui/react";
 const FormSubmit: React.FC = () => {
   const { pending } = useFormStatus();
   return (
-    <Button disabled={pending} type="submit" color="primary">
+    <Button disabled={pending} type="submit" color="primary" size="sm">
       {pending ? "Submitting..." : "Submit"}
     </Button>
   );
