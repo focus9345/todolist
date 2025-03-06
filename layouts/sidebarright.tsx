@@ -36,7 +36,7 @@ const SidebarRight: React.FC = () => {
           {isSidebarOpen ? (
             // Show the sidebar content
             <>
-            <h2>Right Sidebar</h2>
+            <h2>Settings</h2>
             <AddGroup />
             </>
             ) : (<></>) 

@@ -19,7 +19,7 @@ const isInvalidText = (text: string | null | undefined): boolean => {
 }
 
 // Ceate a new group
-const createGroup = async (prevState: string, formData: FormData) => {
+const createGroup = async (prevState: any, formData: FormData) => {
     
     const { dateUTC } = dateModifier(new Date());
     const title = formData.get('groupname') as string;

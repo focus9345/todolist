@@ -1,26 +1,26 @@
 'use client';
 import React from 'react';
-import {Card, CardHeader, CardBody, CardFooter, Avatar, Button} from "@heroui/react";
+import {Card, CardHeader, CardBody, CardFooter, Button} from "@heroui/react";
+import { TaskType } from "../../types/types";
 
 /**
  * Groups that will hold tasks for categorization.
  * 
  * 
  */
-const Task: React.FC = () => {
+interface TaskTypeProps {
+    task: TaskType;
+}
+
+const Task: React.FC<TaskTypeProps> = ( { task }) => {
     const [isFollowed, setIsFollowed] = React.useState(false);
     return (
         <Card className="max-w-[340px] mb-5">
       <CardHeader className="justify-between">
         <div className="flex gap-5">
-          <Avatar
-            isBordered
-            radius="full"
-            size="md"
-            src="https://heroui.com/avatars/avatar-1.png"
-          />
+          
           <div className="flex flex-col gap-1 items-start justify-center">
-            <h4 className="text-small font-semibold leading-none text-default-600">Zoey Lang</h4>
+            <h4 className="text-small font-semibold leading-none text-default-600">{ task.title }</h4>
             <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
           </div>
         </div>
