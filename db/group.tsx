@@ -1,5 +1,7 @@
 import { GroupType, DataTypes } from "../types/types";
-const tempDate = new Date(2024, 1, 1);
+import { today, getLocalTimeZone } from "@internationalized/date";
+
+const localDate = today(getLocalTimeZone());
 
 const GROUPS: GroupType[] = [
     {
@@ -10,7 +12,7 @@ const GROUPS: GroupType[] = [
         group: 'group-1',
         completed: false,
         active: true,
-        date: tempDate,
+        date: localDate,
         project: 'project-1',
         tasks: [
             {
@@ -29,7 +31,7 @@ const GROUPS: GroupType[] = [
         group: 'group-2',
         completed: false,
         active: true,
-        date: tempDate,
+        date: localDate,
         project: 'project-1',
         tasks: [
             {

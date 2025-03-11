@@ -13,7 +13,7 @@ interface TaskTypeProps {
 }
 
 const Task: React.FC<TaskTypeProps> = ( { task }) => {
-    const [isFollowed, setIsFollowed] = React.useState(false);
+   
     return (
         <Card className="max-w-[340px] mb-5">
       <CardHeader className="justify-between">
@@ -24,7 +24,7 @@ const Task: React.FC<TaskTypeProps> = ( { task }) => {
             <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
           </div>
         </div>
-        <Button
+        {/* <Button
           className={isFollowed ? "bg-transparent text-foreground border-default-200" : ""}
           color="primary"
           radius="full"
@@ -33,7 +33,7 @@ const Task: React.FC<TaskTypeProps> = ( { task }) => {
           onPress={() => setIsFollowed(!isFollowed)}
         >
           {isFollowed ? "Unfollow" : "Follow"}
-        </Button>
+        </Button> */}
       </CardHeader>
       <CardBody className="px-3 py-0 text-small text-default-400">
         <p>Frontend developer and UI/UX enthusiast. Join me on this coding adventure!</p>

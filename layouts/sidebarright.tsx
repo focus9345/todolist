@@ -1,8 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import AddGroup from '../components/forms/addgroup';
+import AddTask from '../components/forms/addtask';
 import { cn } from '../utils/clsxtw';
-import { Button } from '@heroui/react';
+import { Button, Divider } from '@heroui/react';
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 
 const SidebarRight: React.FC = () => {
@@ -38,6 +39,8 @@ const SidebarRight: React.FC = () => {
             <>
             <h2>Settings</h2>
             <AddGroup />
+            <Divider />
+            <AddTask />
             </>
             ) : (<></>) 
             }

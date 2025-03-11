@@ -34,7 +34,7 @@ const AddGroup: React.FC = () => {
           <p>{state.message}</p>
         </div>
       )}
-    <h3 className="text-sm">Add a New Group</h3>
+    <h3 className="text-sm pb-2 font-semibold">Add a New Group</h3>
     <Form
       className="w-full max-w-xs"
       validationBehavior="native"
@@ -45,7 +45,7 @@ const AddGroup: React.FC = () => {
         errorMessage="Please enter a unique group name"
         label="Goup Name"
         className="max-w-xs"
-        labelPlacement="outside"
+        labelPlacement="inside"
         size="sm"
         variant="faded"
         name="groupname"

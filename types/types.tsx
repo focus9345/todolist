@@ -1,3 +1,5 @@
+import { CalendarDate } from '@internationalized/date'
+
 export enum DataTypes {
     group = 'group',
     task = 'task',
@@ -24,7 +26,7 @@ export type GroupType = {
     group?: string;
     completed?: boolean;
     active?: boolean;
-    date?: Date;
+    date?: CalendarDate;
     project?: string;
     tasks?: TaskType[];
 }    
@@ -35,18 +37,18 @@ export type TaskType = {
     title?: string;
     description?: string;
     status?: TaskStatus;
-    deadline?: Date;
+    deadline?: CalendarDate | null;
     priority?: TaskPriority;
-    group?: string;
-    assignee?: string;
-    creator?: string;
-    created?: Date;
-    estimated?: Date;
-    updated?: Date;
-    tags?: string[];
-    subtasks?: SubtaskType[];
-    dependencies?: TaskType[];
-    project?: string;
+    group?: string | null;
+    assignee?: string | null;
+    creator?: string | null;
+    created?: CalendarDate;
+    estimated?: CalendarDate | null;
+    updated?: CalendarDate | null;
+    tags?: string[] | null;
+    subtasks?: SubtaskType[] | null;
+    dependencies?: TaskType[] | null;
+    project?: string | null;
 }
 
 export type SubtaskType = {
@@ -55,13 +57,13 @@ export type SubtaskType = {
     title?: string;
     description?: string;
     status?: TaskStatus;
-    deadline?: Date;
+    deadline?: CalendarDate;
     priority?: TaskPriority;
     group?: string;
     assignee?: string;
     creator?: string;
-    created?: Date;
-    updated?: Date;
+    created?: CalendarDate;
+    updated?: CalendarDate;
     tags?: string[];
     project?: string;
 }

@@ -1,6 +1,9 @@
 import { TaskType, DataTypes, TaskStatus, TaskPriority } from "../types/types";
+import { today, getLocalTimeZone } from "@internationalized/date";
+const localDate = today(getLocalTimeZone());
 
-const tempDate = new Date(2024, 1, 1);
+console.log('localDate: ' + localDate);
+
 
 const TASKS: TaskType[] = [
     {
@@ -9,14 +12,14 @@ const TASKS: TaskType[] = [
             title: 'Task 1',
             description: 'basic task',
             status: TaskStatus.open,
-            deadline: tempDate,
+            deadline: localDate,
             priority: TaskPriority.high,
             group: 'group-1',
             assignee: 'John Snow',
             creator: 'Tom Jones',
-            created: tempDate,
-            estimated: tempDate,
-            updated: tempDate,
+            created: localDate,
+            estimated: localDate,
+            updated: localDate,
             tags: ['this', 'that'],
             subtasks: [{id: '0001'}, {id: '0002'}],
             dependencies: [],
@@ -28,14 +31,14 @@ const TASKS: TaskType[] = [
         title: 'Task 2',
         description: 'basic task',
         status: TaskStatus.open,
-        deadline: tempDate,
+        deadline: localDate,
         priority: TaskPriority.high,
         group: 'group-1',
         assignee: 'John Snow',
         creator: 'Tom Jones',
-        created: tempDate,
-        estimated: tempDate,
-        updated: tempDate,
+        created: localDate,
+        estimated: localDate,
+        updated: localDate,
         tags: ['this', 'that'],
         subtasks: [{id: '0003'}, {id: '0002'}],
         dependencies: [{id: '001'}],
