@@ -1,7 +1,9 @@
 import { GroupType, DataTypes } from "../types/types";
-import { today, getLocalTimeZone } from "@internationalized/date";
+import { today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 
-const localDate = today(getLocalTimeZone());
+// local date is ISO 8601 string
+const localDate: CalendarDate = today(getLocalTimeZone());
+const localDateString: string = localDate.toString();
 
 const GROUPS: GroupType[] = [
     {
@@ -12,7 +14,7 @@ const GROUPS: GroupType[] = [
         group: 'group-1',
         completed: false,
         active: true,
-        date: localDate,
+        date: localDateString,
         project: 'project-1',
         tasks: [
             {
@@ -31,12 +33,15 @@ const GROUPS: GroupType[] = [
         group: 'group-2',
         completed: false,
         active: true,
-        date: localDate,
+        date: localDateString,
         project: 'project-1',
         tasks: [
             {
                 id: '005',
-            }
+            },
+            {
+                id: '003',
+            },
         ]
     },
 ]

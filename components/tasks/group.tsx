@@ -36,12 +36,14 @@ async function Tasks({ grouptask }: TasksTypeProps) {
 
 const Group: React.FC<GroupTypeProps> = ({ group }) => {
   return (
-    <section className="border border-zinc-800 rounded-md grid grid-rows gap-2 px-4 justify-center">
+    <>
+    <section className="border border-zinc-500/40 rounded-md grid grid-rows gap-2 px-2 justify-center sm:max-w-[340px] max-w-full">
       <h3 className="text-center text-lg py-1"> {group.title}</h3>
       <Suspense fallback={<LoadingSpinner label="Loading Groups..." />}>
         <Tasks grouptask={group.tasks} />
       </Suspense>
     </section>
+    </>
   );
 };
 export default Group;

@@ -1,14 +1,21 @@
-import { CalendarDate } from '@internationalized/date'
-
+// Definition of the types for the data in the application
 export enum DataTypes {
     group = 'group',
     task = 'task',
     subtask = 'subtask',
 }
 export enum TaskStatus {
-    open = 'open',
+    opened = 'opened',
     inprogress = 'inprogress',
+    inreview = 'inreview',
+    intest = 'intest',
+    pending = 'pending',
+    blocked = 'blocked',
     completed = 'completed',
+    rejected = 'rejected',
+    accepted = 'accepted',
+    abandoned = 'abandoned',
+    reopened = 'reopened',
     archived = 'archived',
 }
 export enum TaskPriority {
@@ -17,16 +24,27 @@ export enum TaskPriority {
     high = 'high',
     critical = 'critical',
 }
+// export type to define the type of the data for ISO 8601 date string
+export type TYear = `${number}${number}${number}${number}`;
+export type TMonth = `${number}${number}`;
+export type TDay = `${number}${number}`;
+export type THours = `${number}${number}`;
+export type TMinutes = `${number}${number}`;
+export type TSeconds = `${number}${number}`;
+export type TMilliseconds = `${number}${number}${number}`;
+export type TDateISODate = `${TYear}-${TMonth}-${TDay}`;
+export type TDateISOTime = `${THours}:${TMinutes}:${TSeconds}.${TMilliseconds}`;
+export type TDateISO = `${TDateISODate}T${TDateISOTime}Z`;
 
 export type GroupType = {
     id: string;
     type?: DataTypes.group;
-    title?: string | null;
+    title?: string;
     description?: string;
     group?: string;
     completed?: boolean;
     active?: boolean;
-    date?: CalendarDate;
+    date?: string;
     project?: string;
     tasks?: TaskType[];
 }    
@@ -37,18 +55,18 @@ export type TaskType = {
     title?: string;
     description?: string;
     status?: TaskStatus;
-    deadline?: CalendarDate | null;
+    deadline?: string;
     priority?: TaskPriority;
-    group?: string | null;
-    assignee?: string | null;
-    creator?: string | null;
-    created?: CalendarDate;
-    estimated?: CalendarDate | null;
-    updated?: CalendarDate | null;
-    tags?: string[] | null;
-    subtasks?: SubtaskType[] | null;
-    dependencies?: TaskType[] | null;
-    project?: string | null;
+    group?: string;
+    assignee?: string;
+    creator?: string;
+    created?: string;
+    estimated?: string;
+    updated?: string;
+    tags?: string[];
+    subtasks?: SubtaskType[];
+    dependencies?: TaskType[];
+    project?: string;
 }
 
 export type SubtaskType = {
@@ -57,13 +75,13 @@ export type SubtaskType = {
     title?: string;
     description?: string;
     status?: TaskStatus;
-    deadline?: CalendarDate;
+    deadline?: string;
     priority?: TaskPriority;
     group?: string;
     assignee?: string;
     creator?: string;
-    created?: CalendarDate;
-    updated?: CalendarDate;
+    created?: string;
+    updated?: string;
     tags?: string[];
     project?: string;
 }

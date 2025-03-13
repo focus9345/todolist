@@ -32,7 +32,7 @@ async function taskAction(prevState: TaskFormState, formData: FormData): Promise
 
 const AddTask: React.FC = () => {
   
-  const [date, setDate] = React.useState(today(getLocalTimeZone()));
+  const [date] = React.useState(today(getLocalTimeZone()));
 
   //const [formattedDate, setFormattedDate] = React.useState(date);
 
