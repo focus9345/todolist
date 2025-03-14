@@ -6,7 +6,7 @@ import { saveGroup } from '../api/groupdata';
 import { saveTask } from '../api/taskdata';
 import uniqueName from '../utils/uniqueName';
 import slugify from 'slugify';
-import { CalendarDate,parseDate, today, getLocalTimeZone } from "@internationalized/date";
+import { CalendarDate, parseDate, today, getLocalTimeZone } from "@internationalized/date";
 
 
 // Text Input Validation
@@ -22,7 +22,7 @@ const isInvalidText = (text: string | null | undefined): boolean => {
 // Ceate a new group
 const createGroup = async (prevState: any, formData: FormData) => {
     
-    const localDate = today(getLocalTimeZone());
+    const localDate = today(getLocalTimeZone()).toString(); // update this
     const title = formData.get('groupname') as string;
     const group: GroupType = {
         id: uniqueName(4) as string,
@@ -32,7 +32,7 @@ const createGroup = async (prevState: any, formData: FormData) => {
         group: slugify(title || '', { lower: true }) as string,
         completed: false as boolean,
         active: true as boolean,
-        date: localDate as CalendarDate,
+        date: localDate as string,
         project: '' as string,
         tasks: [] as TaskType[],
     }
@@ -50,13 +50,13 @@ const createGroup = async (prevState: any, formData: FormData) => {
 // Ceate a new task
 const createTask = async (prevState: any, formData: FormData) => {
     
-    const localDate = today(getLocalTimeZone());
+    const localDate = today(getLocalTimeZone()).toString(); //update this
     // Get Form Data
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
     const status = formData.get('status') as TaskStatus;
-    const deadlineValue = formData.get('deadline');
-    const deadline = deadlineValue ? parseDate(deadlineValue as string) : null;
+    const deadline = formData.get('deadline') as string;
+    //const deadline = deadlineValue ? parseDate(deadlineValue as string) : null;
     const priority = formData.get('priority') as TaskPriority;
     const assignee = formData.get('assignee') as string;
     const creator = formData.get('creator') as string;

@@ -1,51 +1,60 @@
-import { CalendarDate } from '@internationalized/date';
+import {
+    CalendarDate,
+    getLocalTimeZone,
+    parseDate,
+    today,
+} from "@internationalized/date";
+import { useDateFormatter } from "@react-aria/i18n";
 
-/** @file 
- * Helper file for date data
- * Get todays date as a Date object
- * Modify date object to display in different formats
- * Get the difference between two dates in days
- * No Longer used in the project
- */
-
-// This function will get the current date
-const todaysDate = (): Date => {
-    return new Date();
-}
-
-// Get the difference between two dates in days
-function getDifferenceInDays(date1: Date, date2: Date): number {
-    const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
-    const diffDays = Math.round(Math.abs((date1.getTime() - date2.getTime()) / oneDay));
-    return diffDays;
-}
-
-function convertDateToCalendarDate(date: Date): CalendarDate {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1; // Month is 0-indexed in Date
-    const day = date.getDate();
-    return new CalendarDate(year, month, day);
-  }
-
-// Closure approach to modifying the date
-const dateModifier = (date: Date | string | number ) => {
-    const currentDate: Date = new Date(date);
-    const today: Date = todaysDate();
-    return {
-        dateString: () => currentDate.toDateString(), // Display date as string - Expected output: "Wed Jul 28 2020"
-        dateUTC: () => currentDate.toUTCString(), // Display date as UTC
-        dateObject: () => currentDate, // Display date as object
-        dateISO: () => currentDate.toISOString(), // Display date as ISO
-        dateLocale: () => currentDate.toLocaleDateString(), // Display date as locale
-        dateDifference: () => getDifferenceInDays(currentDate, today), // Get difference between two dates
-        addDays: (days: number) => {
-            const newDate = new Date(currentDate);
-            newDate.setDate(newDate.getDate() + days);
-            return newDate;
-        },
-        convertDateToCalendarDate: () => convertDateToCalendarDate(currentDate),
-        };
+/*
+    * @module utils/dates
+    * @requires react
+    * @requires internationalized/date
+    * @requires react-aria/i18n
+    */
+// Dev Note: I think this might return the Server Time, not the clients time.
+// validate the date object or string
+const validateDate = (date: CalendarDate): boolean => {
+    if (date === null || date === undefined || date instanceof CalendarDate === false) {
+        return false;
     }
+    return true;
+};
+// This function will return the current date and time in the local time zone
+const CreateDate = (): CalendarDate => {
+    const date = today(getLocalTimeZone());
+    if (!validateDate(date)) {
+        throw new Error("Unable to create the date");
+    }
+    return date;
+};
+// This function will return the current date as a string in the local time zone
+const FormatDate = (date: string | CalendarDate): string => {
+    const caldate: CalendarDate = date instanceof CalendarDate ? date : parseDate(date);
+    if (!validateDate(caldate)) {
+        throw new Error("Invalid date input, if you are using a string make sure it is in the format 'YYYY-MM-DD'");
+    }
+    const dateFormatter = useDateFormatter({ dateStyle: "long" });
+    return dateFormatter.format(caldate.toDate(getLocalTimeZone()));
+};
 
-export { todaysDate, dateModifier, getDifferenceInDays, convertDateToCalendarDate };
+const DateParts = (date: string | CalendarDate): Intl.DateTimeFormatPart[] => {
+    const caldate: CalendarDate = date instanceof CalendarDate ? date : parseDate(date);
+    if (!validateDate(caldate)) {
+        throw new Error("Invalid date input, if you are using a string make sure it is in the format 'YYYY-MM-DD'");
+    };
+    const dateFormatter = useDateFormatter({ dateStyle: "long" });
+    return dateFormatter.formatToParts(caldate.toDate(getLocalTimeZone()));
+};
 
+const DateMonthDay = (date: string | CalendarDate): string[] => {
+    const caldate: CalendarDate = date instanceof CalendarDate ? date : parseDate(date);
+    if (!validateDate(caldate)) {
+        throw new Error("Invalid date input, if you are using a string make sure it is in the format 'YYYY-MM-DD'");
+    };
+    const month = DateParts(caldate)[0].value.slice(0, 3).toLocaleUpperCase();
+    const day = caldate.day.toString();
+    return [month, day];
+};
+
+export { CreateDate, FormatDate, DateParts, DateMonthDay };

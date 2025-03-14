@@ -1,12 +1,13 @@
+'use client';
 import React from 'react';
-import { todaysDate, dateModifier } from '../utils/dates';
+import { CreateDate, FormatDate } from '../utils/dates';
 /**
  * A Primary Footer for the App.
  * 
  * 
  */
 const Footer: React.FC = () => {
-    const date = dateModifier(todaysDate()).dateString();
+    const date = FormatDate(CreateDate());
     return (
         <footer className="p-10 border-t-3 border-zinc-800">
             <div className="text-xs text-center">
