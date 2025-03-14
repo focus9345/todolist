@@ -118,7 +118,7 @@ const AddTask: React.FC = () => {
           className="max-w-xs"
           label="Set Status"
           name="status"
-          defaultValue={TaskStatus.open}
+          value={TaskStatus.opened}
         >
           {Object.values(TaskStatus).map((status: string) => (
             <SelectItem key={status} value={status}>
