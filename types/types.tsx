@@ -1,3 +1,5 @@
+//import mongoose from 'mongoose';
+import { Document } from "mongoose";
 // Definition of the types for the data in the application
 export enum DataTypes {
     group = 'group',
@@ -25,21 +27,21 @@ export enum TaskPriority {
     critical = 'critical',
 }
 // export type to define the type of the data for ISO 8601 date string
-export type TYear = `${number}${number}${number}${number}`;
-export type TMonth = `${number}${number}`;
-export type TDay = `${number}${number}`;
-export type THours = `${number}${number}`;
-export type TMinutes = `${number}${number}`;
-export type TSeconds = `${number}${number}`;
-export type TMilliseconds = `${number}${number}${number}`;
-export type TDateISODate = `${TYear}-${TMonth}-${TDay}`;
-export type TDateISOTime = `${THours}:${TMinutes}:${TSeconds}.${TMilliseconds}`;
-export type TDateISO = `${TDateISODate}T${TDateISOTime}Z`;
+// export type TYear = `${number}${number}${number}${number}`;
+// export type TMonth = `${number}${number}`;
+// export type TDay = `${number}${number}`;
+// export type THours = `${number}${number}`;
+// export type TMinutes = `${number}${number}`;
+// export type TSeconds = `${number}${number}`;
+// export type TMilliseconds = `${number}${number}${number}`;
+// export type TDateISODate = `${TYear}-${TMonth}-${TDay}`;
+// export type TDateISOTime = `${THours}:${TMinutes}:${TSeconds}.${TMilliseconds}`;
+// export type TDateISO = `${TDateISODate}T${TDateISOTime}Z`;
 
-export type GroupType = {
-    id: string;
-    type?: DataTypes.group;
-    title?: string;
+export type GroupType = Document & {
+ //   _id?: mongoose.Types.ObjectId,
+    type: DataTypes.group;
+    title: string;
     description?: string;
     group?: string;
     completed?: boolean;
@@ -49,8 +51,8 @@ export type GroupType = {
     tasks?: TaskType[];
 }    
 
-export type TaskType = {
-    id: string;
+export type TaskType = Document & {
+    //_id?: mongoose.Types.ObjectId,
     type?: DataTypes.task;
     title?: string;
     description?: string;
@@ -60,17 +62,15 @@ export type TaskType = {
     group?: string;
     assignee?: string;
     creator?: string;
-    created?: string;
     estimated?: string;
-    updated?: string;
     tags?: string[];
     subtasks?: SubtaskType[];
     dependencies?: TaskType[];
     project?: string;
 }
 
-export type SubtaskType = {
-    id: string;
+export type SubtaskType = Document & {
+    //_id?: mongoose.Types.ObjectId,
     type?: DataTypes.subtask;
     title?: string;
     description?: string;
@@ -81,7 +81,6 @@ export type SubtaskType = {
     assignee?: string;
     creator?: string;
     created?: string;
-    updated?: string;
     tags?: string[];
     project?: string;
 }

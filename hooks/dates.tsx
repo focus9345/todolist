@@ -34,7 +34,7 @@ const CreateDate = (): CalendarDate => {
         const intervalId = setInterval(updateDate, 10800000); // 3 hours
         return () => clearInterval(intervalId); // This is important, clear the interval
 
-    }, [date]);
+    }, [date.day, date.month, date.year]);
     if (date === null || date === undefined || date instanceof CalendarDate === false) {
         throw new Error("Invalid date object, unable to update the date");
     };
@@ -66,7 +66,7 @@ const useDailyUpdateParts = (date: string | CalendarDate)  => {
         const intervalId = setInterval(updateDateParts, 10800000); // 3 hours
         return () => clearInterval(intervalId); // This is important, clear the interval
 
-    }, [caldate, dateParts, dateFormatter]);
+    }, [caldate.day, dateParts, dateFormatter]);
 
     return dateParts;
 };

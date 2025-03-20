@@ -1,8 +1,8 @@
 'use client';
 import React, { useActionState } from "react";
-import { Form, Input} from "@heroui/react";
+import { Form, Input, Textarea} from "@heroui/react";
 import FormSubmit from "./formsubmit";
-import { createGroup } from "../../libs/actions";
+import { ValidateGroup } from "../../libs/actions";
 
 /**
  * Component will add a new group.
@@ -19,7 +19,7 @@ const initialState: GroupFormState = {
 
 async function groupAction(prevState: GroupFormState, formData: FormData): Promise<GroupFormState> {
   // Existing group logic
-  const result = await createGroup(prevState, formData);
+  const result = await ValidateGroup(prevState, formData);
   return {
     message: result?.message || "Success!",
   };
@@ -52,6 +52,19 @@ const AddGroup: React.FC = () => {
         placeholder="Enter Group Name"
         type="text"
       />
+      <Textarea
+          className="max-w-xs"
+          defaultValue=""
+          description="Enter a description for the group"
+          errorMessage="Please enter a description for the group"
+          isRequired
+          label="Description"
+          labelPlacement="outside"
+          name="description"
+          placeholder="Enter your group description"
+          size="sm"
+          variant="faded"
+        />
       <FormSubmit />
       {/* {submitted && (
         <div className="text-small text-default-500">

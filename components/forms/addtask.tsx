@@ -12,12 +12,11 @@ import {
   SelectItem,
 } from "@heroui/react";
 import FormSubmit from "./formsubmit";
-import { createTask } from "../../libs/actions";
+import { ValidateTask } from "../../libs/actions";
 import {
   today,
   getLocalTimeZone,
   DateValue,
-  parseAbsoluteToLocal,
 } from "@internationalized/date";
 import { useDateFormatter } from "@react-aria/i18n";
 import { TaskStatus, TaskPriority } from "../../types/types";
@@ -41,7 +40,7 @@ async function taskAction(
   formData: FormData
 ): Promise<TaskFormState> {
   // Existing task logic
-  const result = await createTask(prevState, formData);
+  const result = await ValidateTask(prevState, formData);
   return {
     message: result?.message || "Success!",
     isError: result?.message ? true : false,
@@ -70,11 +69,11 @@ const AddTask: React.FC = () => {
       {state.message && (
         <div
           className={cn(
-            state.isError ? "bg-red-800" : "bg-green-800",
+            state.isError ? "bg-green-800" : "bg-red-800",
             "text-center rounded-md my-3 p-2 text-white text-sm"
           )}
         >
-          <p>{state.message}</p>
+          <p>{state.message} : {state.isError.toString()}</p>
         </div>
       )}
       <h3 className="text-sm">Add a New Task</h3>
@@ -118,7 +117,8 @@ const AddTask: React.FC = () => {
           className="max-w-xs"
           label="Set Status"
           name="status"
-          value={TaskStatus.opened}
+          defaultSelectedKeys={[TaskStatus.opened]}
+          isRequired
         >
           {Object.values(TaskStatus).map((status: string) => (
             <SelectItem key={status} value={status}>
@@ -150,18 +150,28 @@ const AddTask: React.FC = () => {
             : "--"}
         </p>
 
-        <RadioGroup label="Set Priority" name="priority">
+
+        <Select
+          className="max-w-xs"
+          label="Set Priority"
+          name="priority"
+          defaultSelectedKeys={[TaskPriority.low]}
+          isRequired
+        >
+          {Object.values(TaskPriority).map((priority: string) => (
+            <SelectItem key={priority} value={priority}>
+              {priority}
+            </SelectItem>
+          ))}
+        </Select>
+
+        {/* <RadioGroup label="Set Priority" name="priority">
           {Object.values(TaskPriority).map((priority: string) => (
             <Radio key={priority} value={priority}>
               {priority}
             </Radio>
           ))}
-        </RadioGroup>
-        <RadioGroup label="Set Group" name="group">
-          <Radio value="group-1">Group 1</Radio>
-          <Radio value="group-2">Group 2</Radio>
-        </RadioGroup>
-
+        </RadioGroup> */}
         <RadioGroup
           label="Set Assignee"
           name="assignee"
@@ -170,27 +180,27 @@ const AddTask: React.FC = () => {
           <Radio value="John Snow">John Snow</Radio>
           <Radio value="Tom Jones">Tom Jones</Radio>
         </RadioGroup>
-        <RadioGroup label="Set Creator" name="creator">
+        <RadioGroup label="Set Creator" name="creator" defaultValue={"John Snow"}>
           <Radio value="John Snow">John Snow</Radio>
           <Radio value="Tom Jones">Tom Jones</Radio>
         </RadioGroup>
-        <CheckboxGroup label="Set Tags" name="tags">
+        <CheckboxGroup label="Set Tags" name="tags" defaultValue={["this"]}>
           <Checkbox value="this">This</Checkbox>
           <Checkbox value="that">That</Checkbox>
         </CheckboxGroup>
-        <CheckboxGroup label="Set Subtasks" name="subtasks">
+        {/* <CheckboxGroup label="Set Subtasks" name="subtasks" defaultValue={["subtask-1"]}>
           <Checkbox value="subtask-1">Subtask 1</Checkbox>
           <Checkbox value="subtask-2">Subtask 2</Checkbox>
-        </CheckboxGroup>
-        <CheckboxGroup
+        </CheckboxGroup> */}
+        {/* <CheckboxGroup
           label="Set Dependencies"
           name="dependencies"
           defaultValue={["task-1", "task-2"]}
         >
           <Checkbox value="task-1">Task 1</Checkbox>
           <Checkbox value="task-2">Task 2</Checkbox>
-        </CheckboxGroup>
-        <RadioGroup label="Set Project" name="project">
+        </CheckboxGroup> */}
+        <RadioGroup label="Set Project" name="project" defaultValue={"project-1"}>
           <Radio value="project-1">Project 1</Radio>
           <Radio value="project-2">Project 2</Radio>
         </RadioGroup>
