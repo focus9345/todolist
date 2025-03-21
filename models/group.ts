@@ -44,6 +44,7 @@ const groupSchema: Schema = new mongoose.Schema<GroupType>({
     ],
 }, { timestamps: true },);
 
+
 const Group = mongoose.models.Group || mongoose.model<GroupType>("Group", groupSchema);
 
 export default Group;

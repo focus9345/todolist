@@ -1,5 +1,5 @@
 //import mongoose from 'mongoose';
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 // Definition of the types for the data in the application
 export enum DataTypes {
     group = 'group',
@@ -39,7 +39,7 @@ export enum TaskPriority {
 // export type TDateISO = `${TDateISODate}T${TDateISOTime}Z`;
 
 export type GroupType = Document & {
- //   _id?: mongoose.Types.ObjectId,
+    _id: mongoose.Types.ObjectId,
     type: DataTypes.group;
     title: string;
     description?: string;
@@ -49,10 +49,12 @@ export type GroupType = Document & {
     date?: string;
     project?: string;
     tasks?: TaskType[];
+    createdAt?: Date;
+    updatedAt?: Date;
 }    
 
 export type TaskType = Document & {
-    //_id?: mongoose.Types.ObjectId,
+    _id: mongoose.Types.ObjectId,
     type?: DataTypes.task;
     title?: string;
     description?: string;
@@ -64,23 +66,29 @@ export type TaskType = Document & {
     creator?: string;
     estimated?: string;
     tags?: string[];
+    groupID?: mongoose.Types.ObjectId,
     subtasks?: SubtaskType[];
     dependencies?: TaskType[];
     project?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export type SubtaskType = Document & {
-    //_id?: mongoose.Types.ObjectId,
+    _id: mongoose.Types.ObjectId,
     type?: DataTypes.subtask;
     title?: string;
     description?: string;
     status?: TaskStatus;
     deadline?: string;
     priority?: TaskPriority;
-    group?: string;
+    groupID?: mongoose.Types.ObjectId,
+    taskID?: mongoose.Types.ObjectId,
     assignee?: string;
     creator?: string;
     created?: string;
     tags?: string[];
     project?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }

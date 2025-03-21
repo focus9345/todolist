@@ -3,7 +3,7 @@ import GroupsGrid from "../../components/tasks/groups-grid";
 import Loading from "../../layouts/loading";
 
 
-export default function Home() {
+const Home: React.FC = () => {
   return (
     <div className="grid grid-flow-row h-dvh font-[family-name:var(--font-geist-sans)] p-6 md:p-10 ">
       <main className="">
@@ -17,3 +17,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home;

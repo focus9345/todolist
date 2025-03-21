@@ -2,12 +2,11 @@
 //import { redirect } from "next/navigation";
 //import { revalidatePath } from "next/cache";
 import { TaskType, DataTypes, TaskStatus, TaskPriority, SubtaskType } from '../types/types';
-import GroupData from '../db/groupdata';
-import TaskData from './taskdata';
+//import GroupData from '../db/groupdata';
+//import TaskData from './taskdata';
 import slugify from 'slugify';
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { NextApiRequest, NextApiResponse } from 'next';
-
+import BASE_URL from '../utils/baseurl';
 
 // Text Input Validation
 const isInvalidText = (text: string | null | undefined): boolean => {
@@ -17,11 +16,6 @@ const isInvalidText = (text: string | null | undefined): boolean => {
         return true; // Return true for non-string values
     }
 }
-// Create a new group
-// async function createGroup(groupData: GroupType): Promise<GroupType> {
-//     const newGroup = await new GroupModel(groupData);
-//     return newGroup.save();
-// };
 
 // Validate a new group
 const ValidateGroup = async (prevState: any, formData: FormData) => {
@@ -30,7 +24,6 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
     const title = formData.get('groupname') as string;
     const description = formData.get('description') as string;
     const group = {
-        //id: uniqueName(4) as string,
         type: DataTypes.group as DataTypes.group,
         title: title as string,
         description: description as string,
@@ -47,26 +40,22 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
     if (isInvalidText(group.description)) {
         return { message: 'Invalid Group Description!', isError: true };
     }
-
-    // console.log('Group: ' + JSON.stringify(group));
-    // Validation passes now save the group
-    // await createGroup(group);
-    // const newGroupModel = new GroupModel(group);
-    // console.log('Do we have ID: ' + (newGroupModel._id instanceof mongoose.Types.ObjectId)); //true
-
+    // Validation passes now prep to save the group
     const reqInit: RequestInit = { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(group),
     };
-  
-    const res = await fetch('/api/groups', reqInit);
-    //const response = await GroupData(req, res);
-    console.log('Response: ' + JSON.stringify(res));
-    return { message: 'Great!!', isError: false };
-    //await saveGroup(group);
-    //revalidatePath('/menu', 'layout');
-    //redirect('/menu');
+    // Call the API to save the group
+    const res = await fetch(BASE_URL + '/api/group', reqInit);
+    // Check if the response is ok
+    if (!res.ok) {
+        return { message: 'Failed to save group!', isError: true };
+    }
+    // Get the JSON response
+    const data = await res.json();
+    return { message: data.message, isError: false };
+
 }
 
 // Ceate a new task
@@ -109,20 +98,21 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
         return { message: 'Invalid Text, must be more than 3 characters!', isError: true
          };
     }
-    console.log('Task: ' + JSON.stringify(task));
-    // Validation passes now save the group
-    const req: NextApiRequest = { 
+    // Validation passes now prep to save the task
+    const reqInit: RequestInit = { 
         method: 'POST',
-        body: task,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(task),
     };
-    await TaskData(req, res || null);
-
-    return { message: 'Success!', isError: false };
-
-    
-    //await saveTask(task);
-    //revalidatePath('/menu', 'layout');
-    //redirect('/menu');
+    // Call the API to save the task
+    const res = await fetch(BASE_URL + '/api/task', reqInit);
+    // Check if the response is ok
+    if (!res.ok) {
+        return { message: 'Failed to save task!', isError: true };
+    }
+    // Get the JSON response
+    const data = await res.json();
+    return { message: data.message, isError: false };
 }
 
 export { ValidateGroup, ValidateTask };

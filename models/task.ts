@@ -43,6 +43,10 @@ const taskSchema: Schema = new mongoose.Schema<TaskType>({
         type: [String],
         required: false,
     },
+    groupID: {
+        type: Schema.Types.ObjectId,
+        ref: "Group",
+    },
     subtasks: [
         {
             type: Schema.Types.ObjectId,
@@ -60,7 +64,7 @@ const taskSchema: Schema = new mongoose.Schema<TaskType>({
         required: false,
     },  
 
-}, { timestamps: true },);
+}, { timestamps: true, autoIndex: true },);
 
 const Task = mongoose.models.Task || mongoose.model<TaskType>("Task", taskSchema);
 

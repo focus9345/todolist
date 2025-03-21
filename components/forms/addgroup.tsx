@@ -3,6 +3,7 @@ import React, { useActionState } from "react";
 import { Form, Input, Textarea} from "@heroui/react";
 import FormSubmit from "./formsubmit";
 import { ValidateGroup } from "../../libs/actions";
+import { cn } from "../../utils/clsxtw";
 
 /**
  * Component will add a new group.
@@ -12,9 +13,11 @@ import { ValidateGroup } from "../../libs/actions";
 
 interface GroupFormState {
   message: string;
+  isError: boolean;
 }
 const initialState: GroupFormState = {
   message: "",
+  isError: false,
 };
 
 async function groupAction(prevState: GroupFormState, formData: FormData): Promise<GroupFormState> {
@@ -22,6 +25,7 @@ async function groupAction(prevState: GroupFormState, formData: FormData): Promi
   const result = await ValidateGroup(prevState, formData);
   return {
     message: result?.message || "Success!",
+    isError: result?.message ? true : false,
   };
 };
 const AddGroup: React.FC = () => {
@@ -30,7 +34,12 @@ const AddGroup: React.FC = () => {
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
       {state.message && (
-        <div className="bg-red-800 text-center rounded-md my-3 p-2">
+        <div
+                  className={cn(
+                    state.isError ? "bg-green-800" : "bg-red-800",
+                    "text-center rounded-md my-3 p-2 text-white text-sm"
+                  )}
+                >
           <p>{state.message}</p>
         </div>
       )}

@@ -2,11 +2,9 @@ import React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ContextProvider from "../../layouts/context-provider";
-import Header from "../../layouts/header";
-import PageWrapper from "../../layouts/wrapper";
-import SidebarRight from "../../layouts/sidebarright";
-import Footer from "../../layouts/footer";
+
+import Providers from "../../layouts/providers";
+
 
 /**
  * A Primary Layout for the App.
@@ -34,32 +32,23 @@ interface RootLayoutProps {
 }
 
 const RootLayout: React.FC<RootLayoutProps> = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+
+  
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ContextProvider>
-         <PageWrapper> 
-          <Header />
-          <div className="flex">
-            <div className="w-full overflow-x-auto ">
-              <div className="sm:h-[calc(99vh-60px)] overflow-auto ">
-                <div className="w-full flex justify-center mx-auto overflow-auto h-[calc(100vh - 60px)] overflow-y-auto relative">
-                  <div className="w-full md:max-w-6xl">{children}
-                  </div>
-                </div>
-              </div>
-            </div>
-           <SidebarRight />
-          </div>
-          
-          <Footer /> 
-         </PageWrapper> 
-        </ContextProvider>
+        <Providers>
+            {children}
+        </Providers>
+                  
       </body>
     </html>
   );
 };
 
 export default RootLayout;
+
+
+
