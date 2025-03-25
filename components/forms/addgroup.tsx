@@ -75,11 +75,6 @@ const AddGroup: React.FC = () => {
           variant="faded"
         />
       <FormSubmit />
-      {/* {submitted && (
-        <div className="text-small text-default-500">
-          You submitted: <code>{JSON.stringify(submitted)}</code>
-        </div>
-      )} */}
     </Form>
     </section>
   );

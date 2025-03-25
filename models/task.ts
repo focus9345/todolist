@@ -46,17 +46,20 @@ const taskSchema: Schema = new mongoose.Schema<TaskType>({
     groupID: {
         type: Schema.Types.ObjectId,
         ref: "Group",
+        required: true,
     },
     subtasks: [
         {
             type: Schema.Types.ObjectId,
             ref: "Subtask",
+            required: false,
         },
     ],
     dependencies: [
         {
             type: Schema.Types.ObjectId,
             ref: "Task",
+            required: false,
         },
     ],
     project: {

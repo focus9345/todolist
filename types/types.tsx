@@ -43,12 +43,11 @@ export type GroupType = Document & {
     type: DataTypes.group;
     title: string;
     description?: string;
-    group?: string;
+    groupslug?: string;
     completed?: boolean;
     active?: boolean;
     date?: string;
-    project?: string;
-    tasks?: TaskType[];
+    projectID?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }    
@@ -61,14 +60,13 @@ export type TaskType = Document & {
     status?: TaskStatus;
     deadline?: string;
     priority?: TaskPriority;
-    group?: string;
     assignee?: string;
     creator?: string;
     estimated?: string;
     tags?: string[];
     groupID?: mongoose.Types.ObjectId,
-    subtasks?: SubtaskType[];
-    dependencies?: TaskType[];
+    subtasks?: [mongoose.Types.ObjectId];
+    dependencies?: [mongoose.Types.ObjectId];
     project?: string;
     createdAt?: Date;
     updatedAt?: Date;

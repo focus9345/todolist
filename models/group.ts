@@ -16,7 +16,7 @@ const groupSchema: Schema = new mongoose.Schema<GroupType>({
         type: String,
         required: false,
     },
-    group: {
+    groupslug: {
         type: String,
         required: false,
     },
@@ -32,17 +32,12 @@ const groupSchema: Schema = new mongoose.Schema<GroupType>({
         type: String,
         required: false,
     },
-    project: {
+    projectID: {
         type: String,
         required: false,
     },
-    tasks: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Task",
-        },
-    ],
-}, { timestamps: true },);
+
+}, { timestamps: true, autoIndex: true },);
 
 
 const Group = mongoose.models.Group || mongoose.model<GroupType>("Group", groupSchema);

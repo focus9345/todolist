@@ -36,16 +36,16 @@ export default async function handler(
                 console.log('Group Created: ' + JSON.stringify(group));
                 res.statusCode = 201;
                 res.end(JSON.stringify({ message: 'Group Created', data: [group] }));
-                return res;
+                break;
             } catch (error) {
                 console.error(error);
                 res.statusCode = 400;
                 res.end(JSON.stringify({ message: 'Group Failed to Post' }));
-                return res;
+                break;
             }     
         default:
                 res.statusCode = 400;
                 res.end(JSON.stringify({ message: 'Error: Group Failed'}));
-                return res;
+                break;
     }
 }

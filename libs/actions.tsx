@@ -4,6 +4,10 @@
 import { TaskType, DataTypes, TaskStatus, TaskPriority, SubtaskType } from '../types/types';
 //import GroupData from '../db/groupdata';
 //import TaskData from './taskdata';
+//import { Schema } from "mongoose";
+//import { CreateDate } from '../utils/dates';
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import slugify from 'slugify';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import BASE_URL from '../utils/baseurl';
@@ -27,12 +31,11 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
         type: DataTypes.group as DataTypes.group,
         title: title as string,
         description: description as string,
-        group: slugify(title || '', { lower: true }) as string,
+        groupslug: slugify(title || '', { lower: true }) as string,
         completed: false as boolean,
         active: true as boolean,
         date: localDate as string,
-        project: '' as string,
-        tasks: [] as TaskType[],
+        projectID: '' as string,
     }
     if (isInvalidText(group.title)) {
         return { message: 'Invalid Group Name!', isError: true };
@@ -53,8 +56,10 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
         return { message: 'Failed to save group!', isError: true };
     }
     // Get the JSON response
-    const data = await res.json();
-    return { message: data.message, isError: false };
+    await res.json();
+    revalidatePath('/', 'layout');
+    redirect('/');
+    //return { message: data.message, isError: false };
 
 }
 
@@ -73,8 +78,8 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
     const creator = formData.get('creator') as string;
     const tagsValue = formData.get('tags');
     const tags = tagsValue ? (tagsValue as string).split(',') : [];
-    const subtasks = formData.get('subtasks') as unknown as SubtaskType[];
-    const dependencies = formData.get('dependencies') as unknown as TaskType[];
+    //const subtasks = formData.get('subtasks') as unknown as Schema.Types.ObjectId[];
+    //const dependencies = formData.get('dependencies') as unknown as Schema.Types.ObjectId[];
     const project = formData.get('project') as string;
 
     // Create a new task object
@@ -90,8 +95,8 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
         creator: creator,
         estimated: localDate,
         tags: tags,
-        subtasks: subtasks,
-        dependencies: dependencies,
+        //subtasks: [],
+        //dependencies: [],
         project: project,
     }
     if (isInvalidText(task.title) || isInvalidText(task.description)) {
@@ -111,8 +116,9 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
         return { message: 'Failed to save task!', isError: true };
     }
     // Get the JSON response
-    const data = await res.json();
-    return { message: data.message, isError: false };
+    await res.json();
+    revalidatePath('/', 'layout');
+    redirect('/');
 }
 
 export { ValidateGroup, ValidateTask };
