@@ -20,7 +20,7 @@ const fetchGroups = async (): Promise<GroupType[]> => {
     throw new Error(`Error fetching groups: ${response.statusText}`);
   }
   const data = await response.json();
-  console.log('Group Data: ' + JSON.stringify(data.data));
+  //console.log('Group Data: ' + JSON.stringify(data.data));
   return data.data;
 };
 

@@ -2,6 +2,9 @@
 import mongoose, { Document } from "mongoose";
 // Definition of the types for the data in the application
 export enum DataTypes {
+    project = 'project',
+    sprint = 'sprint',
+    retrospective = 'retrospective',
     group = 'group',
     task = 'task',
     subtask = 'subtask',
@@ -25,6 +28,12 @@ export enum TaskPriority {
     medium = 'medium',
     high = 'high',
     critical = 'critical',
+}
+export enum UserRoles {
+    superadmin = 'superadmin',
+    admin = 'admin',
+    user = 'user',
+    guest = 'guest',
 }
 // export type to define the type of the data for ISO 8601 date string
 // export type TYear = `${number}${number}${number}${number}`;

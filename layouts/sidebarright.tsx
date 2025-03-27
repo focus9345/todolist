@@ -5,6 +5,7 @@ import AddTask from '../components/forms/addtask';
 import { cn } from '../utils/clsxtw';
 import { Button, Divider } from '@heroui/react';
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import AddProject from '../components/forms/addproject';
 
 const SidebarRight: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
@@ -38,6 +39,8 @@ const SidebarRight: React.FC = () => {
             // Show the sidebar content
             <>
             <h2>Settings</h2>
+            <AddProject />
+            <Divider />
             <AddGroup />
             <Divider />
             <AddTask />

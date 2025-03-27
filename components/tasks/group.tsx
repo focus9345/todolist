@@ -17,7 +17,6 @@ interface GroupTypeProps {
 // }
 
 const fetchTasks = async (id: string): Promise<TaskType[]> => {
-
   const reqInit: RequestInit = { 
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
@@ -27,8 +26,7 @@ const fetchTasks = async (id: string): Promise<TaskType[]> => {
     throw new Error(`Error fetching tasks: ${response.statusText}`);
   }
   const data = await response.json();
-
-  console.log('Task Data: ' + JSON.stringify(data.data));
+  //console.log('Task Data: ' + JSON.stringify(data.data));
   return data.data;
 };
 

@@ -1,11 +1,5 @@
 'use server';
-//import { redirect } from "next/navigation";
-//import { revalidatePath } from "next/cache";
-import { TaskType, DataTypes, TaskStatus, TaskPriority, SubtaskType } from '../types/types';
-//import GroupData from '../db/groupdata';
-//import TaskData from './taskdata';
-//import { Schema } from "mongoose";
-//import { CreateDate } from '../utils/dates';
+import { TaskType, DataTypes, TaskStatus, TaskPriority } from '../types/types';
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import slugify from 'slugify';
@@ -13,6 +7,7 @@ import { today, getLocalTimeZone } from "@internationalized/date";
 import BASE_URL from '../utils/baseurl';
 
 // Text Input Validation
+// Delete this function
 const isInvalidText = (text: string | null | undefined): boolean => {
     if( typeof text === 'string') {
         return !text || text.length < 3 || text === null || text.trim().length === 0;
@@ -20,6 +15,37 @@ const isInvalidText = (text: string | null | undefined): boolean => {
         return true; // Return true for non-string values
     }
 }
+
+// validate a new project
+const ValidateProject = async (prevState: any, formData: FormData) => {
+    // This may be redundent but it is a good practice to sanitize the form data
+    const formDataEntries: Record<string, any> = {};
+    for (const [key, value] of formData.entries()) {
+        const newkey = key.replace(/"/g, '');
+        formDataEntries[newkey] = value;
+    }
+    // create a request Init object
+    const reqInit: RequestInit = { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formDataEntries),
+    };
+    // Call the API to save the project
+    const res = await fetch(BASE_URL + '/api/project', reqInit);
+    // Check if the response is ok
+    if (!res.ok) {
+        const whyfail = await res.json();
+        const failMessage: string = whyfail.message.message;
+        const failErrors: object = whyfail.message.errors
+        return { message: failMessage, errors: failErrors,  isError: true };
+    }
+    // Get the JSON response
+    await res.json();
+    // Revalidate the cache
+    revalidatePath('/', 'layout');
+    // Redirect to the home page
+    redirect('/');
+};
 
 // Validate a new group
 const ValidateGroup = async (prevState: any, formData: FormData) => {
@@ -59,11 +85,10 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
     await res.json();
     revalidatePath('/', 'layout');
     redirect('/');
-    //return { message: data.message, isError: false };
 
 }
 
-// Ceate a new task
+// Validate a new task
 const ValidateTask = async (prevState: any, formData: FormData) => {
     
     const localDate = today(getLocalTimeZone()).toString(); //update this
@@ -121,4 +146,4 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
     redirect('/');
 }
 
-export { ValidateGroup, ValidateTask };
+export { ValidateGroup, ValidateTask, ValidateProject };
