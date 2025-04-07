@@ -9,7 +9,7 @@ import { useDateFormatter } from "@react-aria/i18n";
 import { cn } from "../../utils/clsxtw";
 
 interface DueDateProps {
-  duedate?: string;
+  duedate?: Date | string | CalendarDate;
 }
 
 const DueDate: React.FC<DueDateProps> = ({ duedate }) => {
@@ -23,11 +23,20 @@ const DueDate: React.FC<DueDateProps> = ({ duedate }) => {
     /// issue is ISO 8601 date format "YYYY-MM-DD" needs to be parsed. This should be a utility function.
     //const calduedate: CalendarDate = parseDate(duedate);
     if (duedate) {
-      const calendar = new Date(duedate);
+      let calendar: Date;
+      if (duedate instanceof Date) {
+        calendar = duedate;
+      } else if (typeof duedate === "string") {
+        calendar = new Date(duedate);
+      } else if (duedate) {
+        calendar = duedate.toDate(getLocalTimeZone());
+      } else {
+        throw new Error("Invalid duedate type");
+      }
       const day = calendar.getDate();
       const month = calendar.getMonth() + 1; // Months are zero-based
       const year = calendar.getFullYear();
-
+ 
       //const dateDate: CalendarDate = parseDate(calduedate);
       const dateDate: CalendarDate = new CalendarDate(
         year,

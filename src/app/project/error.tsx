@@ -2,12 +2,12 @@
 import { useEffect } from 'react';
 import { Button } from "@heroui/react"
 
-interface ErrorProps {
-  error: any;
-  reset?: any;
+interface ErrorProps<T> {
+  error: T;
+  reset?: () => void;
 }
 
-  const Error: React.FC<ErrorProps> = ({ error, reset }) => {
+  const Error: React.FC<ErrorProps<{ statusCode: number; message: string }>> = ({ error, reset }) => {
   useEffect(() => {
     // Log the error to an error reporting service
     // This is a demo so just console error
@@ -25,7 +25,7 @@ interface ErrorProps {
  
   return (
     <div className="error flex flex-col items-center justify-center w-full h-screen">
-      <h1>Something went wrong with the Projects!</h1>
+      <h1>Something went wrong with the projects!</h1>
       <p>An unexpected error with our projects at this time.</p>
       <p>{error.message}</p>
       <p><br />
@@ -33,7 +33,7 @@ interface ErrorProps {
         color="danger" 
         onPress={
           // Attempt to recover by trying to re-render the segment
-          () => reset()
+          () => reset && reset()
         }
       >
         Try again
