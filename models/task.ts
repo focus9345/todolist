@@ -1,6 +1,25 @@
 import mongoose, { Schema, InferSchemaType } from "mongoose";
-import { TaskType, DataTypes, TaskTags, TaskStatus, TaskPriority } from "../types/types";
+import { DataTypes, TaskTags, TaskStatus, TaskPriority } from "../types/types";
 
+interface ITaskSchema {
+        _id: mongoose.Types.ObjectId,
+        type?: DataTypes.task;
+        title?: string;
+        description?: string;
+        status?: TaskStatus;
+        deadline?: Date;
+        priority?: TaskPriority;
+        assignee?: string;
+        creator?: string;
+        estimated?: string;
+        tags?: string[];
+        groupId?: mongoose.Types.ObjectId,
+        subtasks?: [mongoose.Types.ObjectId];
+        dependencies?: [mongoose.Types.ObjectId];
+        project?: string;
+        createdAt?: Date;
+        updatedAt?: Date;
+}
 interface AddMonthsFunction {
     (date: Date, monthsToAdd: number): Date;
 }
@@ -11,7 +30,7 @@ const addMonths: AddMonthsFunction = (date, monthsToAdd) => {
     return newDate;
 };
 
-const taskSchema: Schema = new mongoose.Schema<TaskType>({
+const taskSchema: Schema<ITaskSchema> = new mongoose.Schema({
     type: {
         type: String,
         required: true,
@@ -93,8 +112,8 @@ const taskSchema: Schema = new mongoose.Schema<TaskType>({
 
 }, { timestamps: true, autoIndex: true },);
 
-type TaskSchemaType = InferSchemaType<typeof taskSchema>;
-const Task = mongoose.models.Task || mongoose.model<TaskSchemaType>("Task", taskSchema);
+type TaskModelType = InferSchemaType<typeof taskSchema>;
+const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
 
 export default Task;
-export type { TaskSchemaType };
+export type { TaskModelType };

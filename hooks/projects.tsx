@@ -1,9 +1,9 @@
 'use client';
 import { useQuery } from "@tanstack/react-query";
-import { ProjectType } from "../models/project";
+import { ProjectModelType } from "../models/project";
 import BASE_URL from "../utils/baseurl";
 
-const fetchProjects = async (): Promise<ProjectType[]> => {
+const fetchProjects = async (): Promise<ProjectModelType[]> => {
     const response = await fetch(BASE_URL + "/api/project", {
       method: "GET",
       headers: { "Content-Type": "application/json" },

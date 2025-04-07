@@ -1,11 +1,11 @@
 'use client';
 import React from "react";
 import LoadingSpinner from "../../../layouts/loading";
-import { ProjectType } from "../../../models/project";
+import { ProjectModelType } from "../../../models/project";
 import { useProjectsData } from "../../../hooks/projects";
 import { Card, CardHeader, CardBody, CardFooter, Divider, Link } from "@heroui/react";
 
-const Project: React.FC<ProjectType> = () => {
+const Project: React.FC<ProjectModelType> = () => {
     const {
             data: projects,
             isLoading,
@@ -34,7 +34,7 @@ const Project: React.FC<ProjectType> = () => {
               </CardBody>
               <Divider />
               <CardFooter>
-                <Link href={`/project/${project.projectslug}`} color="primary">View {project.title}</Link>
+                <Link href={`/project/${project.slug}`} color="primary">View {project.title}</Link>
               </CardFooter>
             </Card>
           ))}

@@ -1,16 +1,14 @@
 
 import React from "react";
 import Task from "./task";
-import { TaskSchemaType } from "../../models/task";  
+import { TaskModelType } from "../../models/task";  
 /**
  * Tasks that will be displayed.
  *
  *
  */
-
-
 interface TasksProps {
-    tasks: TaskSchemaType[];
+    tasks: TaskModelType[];
 }
 
 const Tasks: React.FC<TasksProps> = ({ tasks }) => {

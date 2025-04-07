@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/react";
-import { TaskSchemaType } from "../../models/task"; 
+import { TaskModelType } from "../../models/task"; 
 import Dependencies from "./dependencies";
 import DueDate from "./due-date";
 import Tags from "./tags";
@@ -14,7 +14,7 @@ import Priority from "./priority";
  *
  */
 interface TaskTypeProps {
-  task: TaskSchemaType;
+  task: TaskModelType;
 }
 
 const Task: React.FC<TaskTypeProps> = ({ task }) => {
@@ -31,16 +31,7 @@ const Task: React.FC<TaskTypeProps> = ({ task }) => {
             </h4>
           </div>
         </div>
-        {/* <Button
-          className={isFollowed ? "bg-transparent text-foreground border-default-200" : ""}
-          color="primary"
-          radius="full"
-          size="sm"
-          variant={isFollowed ? "bordered" : "solid"}
-          onPress={() => setIsFollowed(!isFollowed)}
-        >
-          {isFollowed ? "Unfollow" : "Follow"}
-        </Button> */}
+  
       </CardHeader>
       <CardBody className="px-3 py-0 text-small text-default-400">
       <div className="flex gap-2 mb-2">

@@ -1,13 +1,13 @@
 'use client';
 import { useQuery } from "@tanstack/react-query";
-import { ProjectType } from "../models/project";
+import { ProjectModelType } from "../models/project";
 import BASE_URL from "../utils/baseurl";
 
 interface FetchGroupsResponse {
-  data: ProjectType[];
+  data: ProjectModelType[];
 }
 
-const fetchGroups = async (projectId: string): Promise<ProjectType[]> => {
+const fetchGroups = async (projectId: string): Promise<ProjectModelType[]> => {
   const response = await fetch(BASE_URL + `/api/group?projectId=${projectId}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
@@ -20,7 +20,7 @@ const fetchGroups = async (projectId: string): Promise<ProjectType[]> => {
 };
 
   const useGroupsData = (projectId: string) => {
-    return useQuery<ProjectType[]>({
+    return useQuery<ProjectModelType[]>({
         queryKey: ["groups"], // Query key
         queryFn: () => fetchGroups(projectId),
         enabled: !!projectId,

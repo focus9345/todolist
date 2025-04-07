@@ -2,11 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../libs/db';
 import Task from '../../models/task';
 import Group from '../../models/group';
-import { TaskType } from '../../types/types';
+import { TaskModelType } from '../../models/task';
 
 type ResponseData = {
     message?: string,
-    data?: TaskType[],
+    data?: TaskModelType[],
 } 
 
 export default async function handler(

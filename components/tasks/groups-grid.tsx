@@ -2,7 +2,6 @@
 import React from "react";
 import Group from "./group";
 import LoadingSpinner from "../../layouts/loading";
-import { GroupType } from "../../types/types";
 import { GroupModelType } from "../../models/group";
 import { useGroupsData } from "../../hooks/groups";
 import mongoose from "mongoose";
@@ -38,7 +37,7 @@ const GroupsGrid: React.FC<GroupsGridProps> = ({ projectId }) => {
       <section className="mt-6 p-6 border border-zinc-700 rounded-md">
         <div className="grid md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-5 xl:grid-cols-4 xl:gap-4 size-auto">
           {groups?.map((group) => (
-            <Group key={String(group._id)} group={group as unknown as GroupType} />
+            <Group key={String(group._id)} group={group as unknown as GroupModelType} />
           ))}
         </div>
       </section>

@@ -1,6 +1,5 @@
-//import mongoose from 'mongoose';
-import mongoose, { Document } from "mongoose";
-// Definition of the types for the data in the application
+// This file contains the types and enum for the application
+// To edit application forms start here, these will automatically update the forms
 export enum DataTypes {
     project = 'project',
     sprint = 'sprint',
@@ -66,6 +65,11 @@ export enum UserRoles {
 // export type TDateISOTime = `${THours}:${TMinutes}:${TSeconds}.${TMilliseconds}`;
 // export type TDateISO = `${TDateISODate}T${TDateISOTime}Z`;
 
+
+{/*
+Looking for data types for the application?
+Find them in the models folder. Exported through mongoose.
+
 export type GroupType = Document & {
     _id: mongoose.Types.ObjectId,
     type: DataTypes.group;
@@ -117,3 +121,5 @@ export type SubtaskType = Document & {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+*/}

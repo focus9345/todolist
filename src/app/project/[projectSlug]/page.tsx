@@ -3,7 +3,7 @@ import React, { Suspense } from "react";
 import { useProjectsData } from "../../../../hooks/projects";
 import GroupsGrid from "../../../../components/tasks/groups-grid";
 import Loading from "../../../../layouts/loading";
-import { ProjectType } from "../../../../models/project";
+import { ProjectModelType } from "../../../../models/project";
 import BackButton from "../../../../layouts/ui/backbutton";
 
 
@@ -14,7 +14,7 @@ interface ProjectProps {
 const Project: React.FC<ProjectProps> = ({ params }) => {
   const { slug } = params;
   const { data, isLoading, isError } = useProjectsData();
-  const projects: ProjectType[] | null = data || null;
+  const projects: ProjectModelType[] | null = data || null;
 
   if (isLoading) {
     return <Loading label="Loading Projects..." />;

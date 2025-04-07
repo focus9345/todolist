@@ -68,9 +68,8 @@ const projectSchema: Schema<IProjectSchema> = new mongoose.Schema({
         next();
     });
     
-    type ProjectType = InferSchemaType<typeof projectSchema>;
-    // Removed the undefined ExtractInterface type
+    type ProjectModelType = InferSchemaType<typeof projectSchema>;
     const Project = mongoose.models.Project || mongoose.model("Project", projectSchema);
     
     export default Project;
-    export type { ProjectType };
+    export type { ProjectModelType };

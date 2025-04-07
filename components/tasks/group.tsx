@@ -1,7 +1,7 @@
 import React from "react";
 import Tasks from "./tasks";
-import { GroupType } from "../../types/types";
-import { TaskSchemaType } from "../../models/task";
+import { GroupModelType } from "../../models/group";
+import { TaskModelType } from "../../models/task";
 import { useTasksData } from "../../hooks/tasks";
 import LoadingSpinner from "../../layouts/loading";
 
@@ -11,7 +11,7 @@ import LoadingSpinner from "../../layouts/loading";
  *
  */
 interface GroupTypeProps {
-  group: GroupType;
+  group: GroupModelType;
 }
 // interface TasksTypeProps {
 //   grouptask: TaskType[] | undefined;
@@ -25,7 +25,7 @@ const Group: React.FC<GroupTypeProps> = ({ group }) => {
     isError,
   } = useTasksData(groupId);
 
-  const tasks = data as TaskSchemaType[];
+  const tasks = data as TaskModelType[];
 
   if (isLoading) {
     return <LoadingSpinner label="Loading Tasks..." />;

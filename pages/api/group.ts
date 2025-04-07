@@ -2,12 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../libs/db';
 import Group from '../../models/group';
 import Project from '../../models/project';
-import { GroupType } from '../../types/types';
+import { GroupModelType } from '../../models/group';
 import slugify from 'slugify';
 
 type ResponseData = {
     message?: string,
-    data?: GroupType[],
+    data?: GroupModelType[],
 } 
 
 export default async function handler(
