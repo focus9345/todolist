@@ -18,8 +18,8 @@ import {
   getLocalTimeZone,
   DateValue,
 } from "@internationalized/date";
-import { useDateFormatter } from "@react-aria/i18n";
-import { TaskStatus, TaskPriority } from "../../types/types";
+//import { useDateFormatter } from "@react-aria/i18n";
+import { TaskStatus, TaskPriority, TaskTags } from "../../types/types";
 import { cn } from "../../utils/clsxtw";
 
 /**
@@ -29,10 +29,12 @@ import { cn } from "../../utils/clsxtw";
  */
 interface TaskFormState {
   message: string;
+  errors: any;
   isError: boolean;
 }
 const initialState: TaskFormState = {
   message: "",
+  errors:{},
   isError: false,
 };
 async function taskAction(
@@ -42,80 +44,89 @@ async function taskAction(
   // Existing task logic
   const result = await ValidateTask(prevState, formData);
   return {
-    message: result?.message || "Success!",
-    isError: result?.message ? true : false,
+    message: result?.message || "Success!", // Default message
+    errors: result?.errors,
+    isError: result?.isError || false, // Adjust this based on your logic
   };
 }
 
 const AddTask: React.FC = () => {
   const [date] = React.useState(today(getLocalTimeZone()));
 
-  //const [formattedDate, setFormattedDate] = React.useState(date);
-
   const [state, formAction] = useActionState<TaskFormState, FormData>(
     taskAction,
     initialState
   );
-  const [valueTitle, setValue] = React.useState("");
+
+    const [errors, setErrors] = React.useState<any>({});
+    //const [isActive, setIsActive] = React.useState(true);
+  
+    React.useEffect(() => {
+      if (state.errors) {
+        Object.keys(state.errors).forEach((key) => {
+          setErrors((prev: any) => ({
+            ...prev,
+            [key]: state.errors[key].message,
+          }));
+        });
+      }
+      }, [state.errors]);
+
+
   //replace this with util function
   const [valueDueDate, setValueDueDate] = React.useState<DateValue | null>(
     date.add({ days: 4 })
   );
 
-  const formatter = useDateFormatter({ dateStyle: "full" });
+  //const formatter = useDateFormatter({ dateStyle: "full" });
 
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
       {state.message && (
-        <div
-          className={cn(
-            state.isError ? "bg-green-800" : "bg-red-800",
-            "text-center rounded-md my-3 p-2 text-white text-sm"
-          )}
-        >
-          <p>{state.message} : {state.isError.toString()}</p>
-        </div>
-      )}
-      <h3 className="text-sm">Add a New Task</h3>
+              <div
+                className={cn(
+                  state.isError ? "bg-red-800" : "bg-green-800",
+                  "text-center rounded-md my-3 p-2 text-white text-sm"
+                )}
+              >
+                <p>
+                {state.isError ? state.message as string : `Project Created`}
+                <br /> state isError: {state.isError ? 'true' : 'false'}
+                <br /> state message: {state.message as string}
+                <br /> state errors: {JSON.stringify(state.errors)}
+                </p>
+              </div>
+            )}
+      <h3 className="text-sm pb-2 font-semibold">Add a New Task</h3>
       <Form
         className="w-full max-w-xs"
-        validationBehavior="native"
+        validationErrors={errors}
         action={(formData: FormData) => formAction(formData)}
       >
         <Input
           className="max-w-xs"
-          defaultValue=""
-          description="Enter a unique task name"
-          errorMessage="Please enter a unique task name"
+          description="Enter a task name"
           isRequired
           label="Task Name"
-          labelPlacement="outside"
+          labelPlacement="inside"
           name="title"
-          placeholder="Enter your task name"
           type="text"
-          value={valueTitle}
-          onValueChange={(valueTitle) => setValue(valueTitle)}
           size="sm"
           variant="faded"
         />
-
         <Textarea
           className="max-w-xs"
-          defaultValue=""
           description="Enter a description for the task"
-          errorMessage="Please enter a description for the task"
-          isRequired
           label="Description"
-          labelPlacement="outside"
+          labelPlacement="inside"
           name="description"
-          placeholder="Enter your task description"
           size="sm"
           variant="faded"
         />
-
         <Select
           className="max-w-xs"
           label="Set Status"
+          labelPlacement="inside"
           name="status"
           defaultSelectedKeys={[TaskStatus.opened]}
           isRequired
@@ -126,34 +137,10 @@ const AddTask: React.FC = () => {
             </SelectItem>
           ))}
         </Select>
-
-        <DatePicker
-          className="max-w-xs"
-          description="Enter a deadline for the task"
-          errorMessage="Please enter a deadline for the task"
-          granularity="day"
-          isRequired
-          label="Deadline"
-          labelPlacement="outside"
-          name="deadline"
-          defaultValue={valueDueDate}
-          onChange={(valueDueDate) =>
-            valueDueDate && setValueDueDate(valueDueDate)
-          }
-          size="sm"
-          variant="faded"
-        />
-        <p className="text-default-500 text-sm">
-          Selected date:{" "}
-          {valueDueDate
-            ? formatter.format(valueDueDate.toDate(getLocalTimeZone()))
-            : "--"}
-        </p>
-
-
         <Select
           className="max-w-xs"
           label="Set Priority"
+          labelPlacement="inside"
           name="priority"
           defaultSelectedKeys={[TaskPriority.low]}
           isRequired
@@ -165,45 +152,48 @@ const AddTask: React.FC = () => {
           ))}
         </Select>
 
-        {/* <RadioGroup label="Set Priority" name="priority">
-          {Object.values(TaskPriority).map((priority: string) => (
-            <Radio key={priority} value={priority}>
-              {priority}
-            </Radio>
+        <DatePicker
+          className="max-w-xs"
+          description="Enter a deadline for the task"
+          granularity="day"
+          isRequired
+          label="Deadline"
+          labelPlacement="inside"
+          name="deadline"
+          defaultValue={valueDueDate}
+          onChange={(valueDueDate) =>
+            valueDueDate && setValueDueDate(valueDueDate)
+          }
+          size="sm"
+          variant="faded"
+        />
+        <Select
+          className="max-w-xs"
+          label="Tags"
+          labelPlacement="inside"
+          name="tags"
+          defaultSelectedKeys={[TaskTags.feature]}
+          selectionMode="multiple"
+          isRequired
+        >
+          {Object.values(TaskTags).map((tag: string) => (
+            <SelectItem key={tag} value={tag}>
+              {tag}
+            </SelectItem>
           ))}
-        </RadioGroup> */}
-        <RadioGroup
-          label="Set Assignee"
+        </Select>
+        {/* will need to be a select for users on this project */}
+        <Input
+          className="max-w-xs"
+          value="Fake Name"
+          isDisabled
+          label="Assignee"
+          labelPlacement="inside"
           name="assignee"
-          defaultValue={"John Snow"}
-        >
-          <Radio value="John Snow">John Snow</Radio>
-          <Radio value="Tom Jones">Tom Jones</Radio>
-        </RadioGroup>
-        <RadioGroup label="Set Creator" name="creator" defaultValue={"John Snow"}>
-          <Radio value="John Snow">John Snow</Radio>
-          <Radio value="Tom Jones">Tom Jones</Radio>
-        </RadioGroup>
-        <CheckboxGroup label="Set Tags" name="tags" defaultValue={["this"]}>
-          <Checkbox value="this">This</Checkbox>
-          <Checkbox value="that">That</Checkbox>
-        </CheckboxGroup>
-        {/* <CheckboxGroup label="Set Subtasks" name="subtasks" defaultValue={["subtask-1"]}>
-          <Checkbox value="subtask-1">Subtask 1</Checkbox>
-          <Checkbox value="subtask-2">Subtask 2</Checkbox>
-        </CheckboxGroup> */}
-        {/* <CheckboxGroup
-          label="Set Dependencies"
-          name="dependencies"
-          defaultValue={["task-1", "task-2"]}
-        >
-          <Checkbox value="task-1">Task 1</Checkbox>
-          <Checkbox value="task-2">Task 2</Checkbox>
-        </CheckboxGroup> */}
-        <RadioGroup label="Set Project" name="project" defaultValue={"project-1"}>
-          <Radio value="project-1">Project 1</Radio>
-          <Radio value="project-2">Project 2</Radio>
-        </RadioGroup>
+          type="text"
+          size="sm"
+          variant="faded"
+        />
 
         <FormSubmit />
       </Form>

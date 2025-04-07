@@ -1,53 +1,44 @@
 'use client';
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
 import Group from "./group";
 import LoadingSpinner from "../../layouts/loading";
 import { GroupType } from "../../types/types";
-import BASE_URL from "../../utils/baseurl";
+import { GroupModelType } from "../../models/group";
+import { useGroupsData } from "../../hooks/groups";
+import mongoose from "mongoose";
 /**
  * Container for many groups.
  *
  *
  */
+interface GroupsGridProps {
+  projectId: mongoose.Types.ObjectId;
+}
 
-const fetchGroups = async (): Promise<GroupType[]> => {
-  const response = await fetch(BASE_URL + "/api/group", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  if (!response.ok) {
-    throw new Error(`Error fetching groups: ${response.statusText}`);
-  }
-  const data = await response.json();
-  //console.log('Group Data: ' + JSON.stringify(data.data));
-  return data.data;
-};
+const GroupsGrid: React.FC<GroupsGridProps> = ({ projectId }) => {
 
-const GroupsGrid: React.FC = () => {
+  console.log('GroupsGrid: ' + projectId);
   const {
-    data: groups,
+    data,
     isLoading,
     isError,
-  } = useQuery<GroupType[]>({
-    queryKey: ["groups"], // Query key
-    queryFn: fetchGroups,
-  });
+  } = useGroupsData(String(projectId));
+  const groups: GroupModelType[] | null = Array.isArray(data) ? data as GroupModelType[] : null;
 
   if (isLoading) {
     return <LoadingSpinner label="Loading Groups..." />;
   }
 
   if (isError || !groups) {
-    return <p>Failed to load groups.</p>;
+    return <p>No groups found.</p>;
   }
 
   return (
     <>
       <section className="mt-6 p-6 border border-zinc-700 rounded-md">
         <div className="grid md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-5 xl:grid-cols-4 xl:gap-4 size-auto">
-          {groups?.map((group: GroupType) => (
-            <Group key={String(group._id)} group={group} />
+          {groups?.map((group) => (
+            <Group key={String(group._id)} group={group as unknown as GroupType} />
           ))}
         </div>
       </section>

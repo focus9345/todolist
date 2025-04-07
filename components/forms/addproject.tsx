@@ -29,7 +29,7 @@ async function projectAction(
   const result = await ValidateProject(prevState, formData);
   
   return {
-    message: result.message,
+    message: result?.message || "Success!",
     errors: result.errors,
     isError: result.isError, // Adjust this based on your logic
   };
@@ -89,7 +89,7 @@ const AddProject: React.FC = () => {
         <Textarea
           className="max-w-xs"
           description="Enter a description for the group"
-          label="Description"
+          label="Project Description"
           labelPlacement="inside"
           name="description"
           size="sm"

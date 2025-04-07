@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../libs/db';
 import Group from '../../models/group';
+import Project from '../../models/project';
 import { GroupType } from '../../types/types';
+import slugify from 'slugify';
 
 type ResponseData = {
     message?: string,
@@ -32,15 +34,24 @@ export default async function handler(
         case 'POST':
             try {
                 const newGroupModel = new Group(req.body);
+                // look  into pre() mongoose to ensure this is done before save
+                if (newGroupModel.slug == null) {
+                                    console.log('Project Slug: ' + newGroupModel.slug);
+                                    newGroupModel.slug = slugify(newGroupModel.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
+                                }
+                // put a legit projectId here
+                const project = await Project.findOne().sort({ field: 'asc', _id: -1 }).limit(1);
+                newGroupModel.projectId = project._id;
+                // temp until Projects are chosen in form.
                 const group = await Group.create(newGroupModel);
-                console.log('Group Created: ' + JSON.stringify(group));
+                //console.log('Group Created: ' + JSON.stringify(group));
                 res.statusCode = 201;
                 res.end(JSON.stringify({ message: 'Group Created', data: [group] }));
                 break;
             } catch (error) {
-                console.error(error);
+                //console.error(error);
                 res.statusCode = 400;
-                res.end(JSON.stringify({ message: 'Group Failed to Post' }));
+                res.end(JSON.stringify({ message: 'Group Failed to Post. ' + error }));
                 break;
             }     
         default:

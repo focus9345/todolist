@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/react";
-import { TaskType } from "../../types/types";
+import { TaskSchemaType } from "../../models/task"; 
 import Dependencies from "./dependencies";
 import DueDate from "./due-date";
 import Tags from "./tags";
@@ -14,11 +14,12 @@ import Priority from "./priority";
  *
  */
 interface TaskTypeProps {
-  task: TaskType;
+  task: TaskSchemaType;
 }
 
 const Task: React.FC<TaskTypeProps> = ({ task }) => {
-
+  console.log("Task: ", task);
+  console.log("dueDate: ", task.deadline);
   return (
     <>
     <Card className="mb-5 w-full bg-amber-900/10 border-1 border-zinc-500/50" >

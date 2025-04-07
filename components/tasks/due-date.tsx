@@ -3,7 +3,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "@heroui/react";
 import {
   CalendarDate,
   getLocalTimeZone,
-  parseDate,
   today,
 } from "@internationalized/date";
 import { useDateFormatter } from "@react-aria/i18n";
@@ -20,8 +19,21 @@ const DueDate: React.FC<DueDateProps> = ({ duedate }) => {
   const formatted = useDateFormatter({ dateStyle: "full" });
 
   React.useEffect(() => {
+    // point to refactor
+    /// issue is ISO 8601 date format "YYYY-MM-DD" needs to be parsed. This should be a utility function.
+    //const calduedate: CalendarDate = parseDate(duedate);
     if (duedate) {
-      const dateDate: CalendarDate = parseDate(duedate);
+      const calendar = new Date(duedate);
+      const day = calendar.getDate();
+      const month = calendar.getMonth() + 1; // Months are zero-based
+      const year = calendar.getFullYear();
+
+      //const dateDate: CalendarDate = parseDate(calduedate);
+      const dateDate: CalendarDate = new CalendarDate(
+        year,
+        month,
+        day,
+      );
       setDueDate(dateDate);
     }
   }, [duedate]);

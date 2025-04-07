@@ -31,9 +31,9 @@ export default async function handler(
         case 'POST':
             try {
                 const newProjectModel = await new Project(req.body);
-                if (newProjectModel.projectslug == null) {
-                    console.log('Project Slug: ' + newProjectModel.projectslug);
-                    newProjectModel.projectslug = slugify(newProjectModel.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
+                if (newProjectModel.slug == null && newProjectModel.title != null) {
+                    console.log('Project Slug: ' + newProjectModel.slug);
+                    newProjectModel.slug = slugify(newProjectModel.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
                 }
                 const project = await Project.create(newProjectModel as ProjectType);
                 res.statusCode = 201;

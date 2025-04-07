@@ -29,6 +29,25 @@ export enum TaskPriority {
     high = 'high',
     critical = 'critical',
 }
+export enum TaskTags {
+    meeting = 'meeting',
+    documentation = 'documentation',
+    design = 'design',
+    development = 'development',
+    testing = 'testing',
+    deployment = 'deployment',
+    maintenance = 'maintenance',
+    bugfix = 'bugfix',
+    feature = 'feature',
+    improvement = 'improvement',
+    refactoring = 'refactoring',
+    research = 'research',
+    planning = 'planning',
+    analysis = 'analysis',
+    review = 'review',
+    feedback = 'feedback',
+    support = 'support', 
+}
 export enum UserRoles {
     superadmin = 'superadmin',
     admin = 'admin',
@@ -52,11 +71,10 @@ export type GroupType = Document & {
     type: DataTypes.group;
     title: string;
     description?: string;
-    groupslug?: string;
+    slug?: string;
     completed?: boolean;
     active?: boolean;
-    date?: string;
-    projectID?: string;
+    projectId?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }    
@@ -67,13 +85,13 @@ export type TaskType = Document & {
     title?: string;
     description?: string;
     status?: TaskStatus;
-    deadline?: string;
+    deadline?: Date;
     priority?: TaskPriority;
     assignee?: string;
     creator?: string;
     estimated?: string;
     tags?: string[];
-    groupID?: mongoose.Types.ObjectId,
+    groupId?: mongoose.Types.ObjectId,
     subtasks?: [mongoose.Types.ObjectId];
     dependencies?: [mongoose.Types.ObjectId];
     project?: string;
@@ -89,8 +107,8 @@ export type SubtaskType = Document & {
     status?: TaskStatus;
     deadline?: string;
     priority?: TaskPriority;
-    groupID?: mongoose.Types.ObjectId,
-    taskID?: mongoose.Types.ObjectId,
+    groupId?: mongoose.Types.ObjectId,
+    taskId?: mongoose.Types.ObjectId,
     assignee?: string;
     creator?: string;
     created?: string;

@@ -1,7 +1,21 @@
-import mongoose, { Schema } from "mongoose";
-import { GroupType, DataTypes } from "../types/types";
+import mongoose, { Schema, InferSchemaType  } from "mongoose";
+import { DataTypes } from "../types/types";
+// import slugify from 'slugify';
 
-const groupSchema: Schema = new mongoose.Schema<GroupType>({
+interface IGroupSchema {
+    _id: mongoose.Types.ObjectId,
+    type: DataTypes.group;
+    title: string;
+    description?: string;
+    slug?: string;
+    completed?: boolean;
+    active?: boolean;
+    projectId?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+const groupSchema: Schema<IGroupSchema> = new mongoose.Schema({
     type: {
         type: String,
         required: true,
@@ -9,38 +23,59 @@ const groupSchema: Schema = new mongoose.Schema<GroupType>({
     },
     title: {
         type: String,
-        required: true,
+        required: [true, 'Please provide a title'],
+        minlength: [3, 'Title must be at least 3 characters'],
+        max_length: [50, 'Title cannot be more than 50 characters'],
+        match: [/^[a-zA-Z0-9 ]+$/, 'Title must be alphanumeric'],
         unique: true,
     },
     description: {
         type: String,
         required: false,
+        minlength: [3, 'Description must be at least 3 characters'],
+        max_length: [350, 'Description cannot be more than 350 characters'],
+        match: [/^[a-zA-Z0-9 ]+$/, 'Description must be alphanumeric'],
     },
-    groupslug: {
+    slug: {
         type: String,
-        required: false,
+        required: true,
+        unique: true,
     },
     completed: {
         type: Boolean,
-        required: false,
+        required: true,
+        set: (value: string | boolean) => {
+            if (typeof value === 'string' && value === 'on') {
+                return true;
+            }
+            return false;
+        },
+        default: false,
     },
     active: {
         type: Boolean,
-        required: false,
+        set: (value: string | boolean) => {
+            if (typeof value === 'string' && value === 'on') {
+                return true;
+            }
+            return false;
+        },
+        required: true,
     },
-    date: {
-        type: String,
-        required: false,
-    },
-    projectID: {
-        type: String,
-        required: false,
+    projectId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Project',
+        required: true,
     },
 
 }, { timestamps: true, autoIndex: true },);
 
-
-const Group = mongoose.models.Group || mongoose.model<GroupType>("Group", groupSchema);
+    // groupSchema.pre('save', function(next) {
+    //     this.slug = slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
+    //     next();
+    // });
+type GroupModelType = InferSchemaType<typeof groupSchema>;
+const Group = mongoose.models.Group || mongoose.model("Group", groupSchema);
 
 export default Group;
-
+export type { GroupModelType };

@@ -1,17 +1,18 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, InferSchemaType } from "mongoose";
 import { DataTypes } from "../types/types";
 import slugify from 'slugify';
-
-interface ProjectSchemaType {
+// move this to types...
+interface IProjectSchema {
+    _id: mongoose.Types.ObjectId,
     type: string;
     title: string;
     description?: string;
-    projectslug: string;
+    slug: string;
     completed: boolean;
     active: boolean;
 }
 
-const projectSchema: Schema<ProjectSchemaType> = new mongoose.Schema<ProjectSchemaType>({
+const projectSchema: Schema<IProjectSchema> = new mongoose.Schema({
     type: {
         type: String,
         required: true,
@@ -33,7 +34,7 @@ const projectSchema: Schema<ProjectSchemaType> = new mongoose.Schema<ProjectSche
         max_length: [350, 'Description cannot be more than 350 characters'],
         match: [/^[a-zA-Z0-9 ]+$/, 'Description must be alphanumeric'],
     },
-    projectslug: {
+    slug: {
         type: String,
         required: true,
         unique: true,
@@ -63,11 +64,12 @@ const projectSchema: Schema<ProjectSchemaType> = new mongoose.Schema<ProjectSche
 }, { timestamps: true, autoIndex: true });
 
     projectSchema.pre('save', function(next) {
-        this.projectslug = slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
+        this.slug = slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
         next();
     });
     
-    type ProjectType = typeof projectSchema;
+    type ProjectType = InferSchemaType<typeof projectSchema>;
+    // Removed the undefined ExtractInterface type
     const Project = mongoose.models.Project || mongoose.model("Project", projectSchema);
     
     export default Project;

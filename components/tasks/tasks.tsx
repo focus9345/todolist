@@ -1,7 +1,7 @@
 
 import React from "react";
 import Task from "./task";
-import { TaskType } from "../../types/types";   
+import { TaskSchemaType } from "../../models/task";  
 /**
  * Tasks that will be displayed.
  *
@@ -10,7 +10,7 @@ import { TaskType } from "../../types/types";
 
 
 interface TasksProps {
-    tasks: TaskType[];
+    tasks: TaskSchemaType[];
 }
 
 const Tasks: React.FC<TasksProps> = ({ tasks }) => {
