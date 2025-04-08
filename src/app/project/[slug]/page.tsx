@@ -16,7 +16,7 @@ const Project: React.FC =  () => {
   const project = projects?.find((project) => project.slug === slug) || null;
 
   if (!slug) {
-    return <p>Error, Sorry please return to <Link href="/project">projects</Link> page .</p>;
+    return <p>Error, Sorry please return to <Link href="/project">projects</Link> page.</p>;
   }
 
   if (isLoading) {
@@ -39,7 +39,6 @@ const Project: React.FC =  () => {
         <div><BackButton /></div>
         </div>
         <Suspense fallback={<Loading label="Loading Groups..." />}>
-        
           <GroupsGrid projectId={project._id} /> 
         </Suspense>
       </main>

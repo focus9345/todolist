@@ -26,7 +26,7 @@ const sanitizeFormData = (formData: FormData) => {
             sanitizedValue = value as string[];
         }
         sanitizedValue = value as string;
-        sanitizedData[newkey] = sanitizedValue;
+        sanitizedData[key] = sanitizedValue;
     }
     return sanitizedData;
 }
@@ -93,6 +93,7 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
 
 // Validate a new task
 const ValidateTask = async (prevState: any, formData: FormData) => {
+    console.log('Tags: ' + formData.get('tags'));
         // sanitize the form data
         const formDataEntries: Record<string, any> = sanitizeFormData(formData);
     // Validation passes now prep to save the group

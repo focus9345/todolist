@@ -22,7 +22,6 @@ import { useDateFormatter } from "@react-aria/i18n";
 // This function will return the current date and time in the local time zone
 const CreateDate = (): CalendarDate => {
     const [date, setDate] = React.useState(today(getLocalTimeZone()));
-    console.log('Cla' + date);
     React.useEffect(() => {
         const updateDate = () => {
             const now = today(getLocalTimeZone());

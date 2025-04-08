@@ -50,6 +50,7 @@ const taskSchema: Schema<ITaskSchema> = new mongoose.Schema({
         minlength: [3, 'Description must be at least 3 characters'],
         max_length: [350, 'Description cannot be more than 350 characters'],
         match: [/^[a-zA-Z0-9 ]+$/, 'Description must be alphanumeric'],
+        default: 'No description provided',
     },
     status: {
         type: String,
@@ -72,6 +73,7 @@ const taskSchema: Schema<ITaskSchema> = new mongoose.Schema({
     assignee: {
         type: String,
         required: false,
+        default: 'Fake User',
     },
     creator: {
         type: String,
@@ -82,6 +84,7 @@ const taskSchema: Schema<ITaskSchema> = new mongoose.Schema({
         type: Date,
         min: [new Date(), 'Estimated date must be in the future'],
         required: false,
+        default: addMonths((new Date()), 1),
     },
     tags: {
         type: [String],
