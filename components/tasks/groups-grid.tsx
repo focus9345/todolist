@@ -15,8 +15,6 @@ interface GroupsGridProps {
 }
 
 const GroupsGrid: React.FC<GroupsGridProps> = ({ projectId }) => {
-
-  console.log('GroupsGrid: ' + projectId);
   const {
     data,
     isLoading,

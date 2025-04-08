@@ -2,16 +2,19 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import BASE_URL from '../utils/baseurl';
+import { JSDOM } from 'jsdom';  
 import sanitize from 'dompurify';
 
 // used to prevent xss attacks
 const sanitizeFormData = (formData: FormData) => {
-    const sanitizedData: Record<string, any> = {};
+    const sanitizedData: Record<string, any> = {};  
+    const window = new JSDOM('').window;
+    const DOMPurify = createDOMPurify(window);
     for (const [key, value] of formData.entries()) {
         const newkey = key.replace(/"/g, '');
         let sanitizedValue;
         if (newkey === 'description' || newkey === 'comment') {
-            sanitizedValue = sanitize(value);
+            sanitizedValue = DOMPurify.sanitize(value);
             continue;
         }
         if (newkey === 'completed' || newkey === 'active') {
@@ -22,8 +25,11 @@ const sanitizeFormData = (formData: FormData) => {
             }
         }
         if (newkey === 'tags') {
-            console.log('Tags: ' + value);
-            sanitizedValue = value as string[];
+            sanitizedData[key] = [];
+            //console.log('Tags: ' + value);
+            sanitizedValue = value as string;
+            sanitizedData[key].push(sanitizedValue);
+            continue;
         }
         sanitizedValue = value as string;
         sanitizedData[key] = sanitizedValue;
