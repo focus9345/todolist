@@ -8,7 +8,7 @@ interface FetchTasksResponse {
 }
 
 const fetchTasks = async (groupId: string): Promise<TaskModelType[]> => {
-    const response = await fetch(BASE_URL + `/api/task?groupId=${groupId}`, {
+    const response = await fetch(BASE_URL + `/api/tasksbygroup?groupId=${groupId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     });

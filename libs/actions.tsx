@@ -56,9 +56,9 @@ const ValidateProject = async (prevState: any, formData: FormData) => {
     // Get the JSON response
     await res.json();
     // Revalidate the cache
-    revalidatePath('/', 'layout');
+    revalidatePath('/project', 'layout');
     // Redirect to the home page
-    redirect('/');
+    redirect('/project');
 };
 
 // Validate a new group
@@ -85,9 +85,9 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
     // Get the JSON response
     await res.json();
     // Revalidate the cache
-    revalidatePath('/', 'layout');
+    revalidatePath('/project', 'layout');
     // Redirect to the home page
-    redirect('/');
+    redirect('/project');
 
 }
 
@@ -112,8 +112,8 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
     }
     // Get the JSON response
     await res.json();
-    revalidatePath('/', 'layout');
-    redirect('/');
+    revalidatePath('/project', 'layout');
+    redirect('/project');
 }
 
 export { ValidateGroup, ValidateTask, ValidateProject };
