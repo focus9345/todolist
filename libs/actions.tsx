@@ -2,40 +2,60 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import BASE_URL from '../utils/baseurl';
-import DOMPurify from 'dompurify';
+import xss from 'xss';
 
 
 // used to prevent xss attacks
 const sanitizeFormData = (formData: FormData) => {
-     const sanitizedData = DOMPurify.sanitize(formData);
-    // const sanitizedData: Record<string, any> = {};  
-    // const window = new JSDOM('').window;
-    // const DOMPurify = createDOMPurify(window);
-    // for (const [key, value] of formData.entries()) {
-    //     const newkey = key.replace(/"/g, '');
-    //     let sanitizedValue;
-    //     if (newkey === 'description' || newkey === 'comment') {
-    //         sanitizedValue = DOMPurify.sanitize(value);
-    //         continue;
-    //     }
-    //     if (newkey === 'completed' || newkey === 'active') {
-    //         if (typeof value === 'string' && value === 'on') {
-    //             sanitizedValue = true;
-    //         } else {
-    //             sanitizedValue = false;
-    //         }
-    //     }
-    //     if (newkey === 'tags') {
-    //         sanitizedData[key] = [];
-    //         //console.log('Tags: ' + value);
-    //         sanitizedValue = value as string;
-    //         sanitizedData[key].push(sanitizedValue);
-    //         continue;
-    //     }
-    //     sanitizedValue = value as string;
-    //     sanitizedData[key] = sanitizedValue;
-    // }
-    // return sanitizedData;
+    const sanitizedData: Record<string, string | string[] | boolean> = {};
+    const formValues = Object.fromEntries(formData);
+    // Special case for tags because they are stored as an array
+    const tags = formData.getAll('tags');
+
+    //lets sanitize the form values
+    for (const [key, value] of Object.entries(formValues)) {
+        const newkey = key.replace(/"/g, '');
+        
+        let sanitizedValue;
+        if ( Array.isArray(value) || key === 'tags') {
+            continue;
+        }
+        if (typeof value === 'string' && value.trim() === '') {
+            continue;
+        }
+        // convert the value to a boolean if the key is completed or active
+        if (newkey === 'completed' || newkey === 'active') {
+            if (typeof value === 'string' && value.trim() === 'on') {
+                sanitizedValue = true;
+            } else {
+                sanitizedValue = false;
+            }
+            continue;
+        } else {
+            sanitizedValue = xss(String(sanitizedValue));
+        }
+        sanitizedData[key] = sanitizedValue ?? '';
+    }
+    // special case for tags because they are stored as an array
+    if (tags.length > 0) {
+        const sanitizedTags: string[] = [];
+        for (const tag of tags) {
+            if (typeof tag === 'string' && tag.trim() !== '') {
+                const sanitizedTag = xss(tag);
+                sanitizedTags.push(sanitizedTag);
+            }
+        }
+        sanitizedData['tags'] = sanitizedTags;
+    }
+
+    console.log('Sanitized Data: ', sanitizedData);
+    // remove any empty values from the object
+    Object.keys(sanitizedData).forEach((key) => {
+        if (sanitizedData[key] === '' || sanitizedData[key] === undefined) {
+            delete sanitizedData[key];
+        }
+    });
+    return sanitizedData;
 }
 
 // Below can be reduced to one function. need to pass API fetch destination as parameter.
