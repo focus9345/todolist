@@ -13,9 +13,9 @@ interface TagsProps {
 const Tags: React.FC<TagsProps> = ({ tags }) => {
 
 return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 flex-wrap justify-center">
         {tags.map((tag, index) => (
-            <Chip key={index} color="secondary" variant="bordered" size="sm">
+            <Chip key={index} color="secondary" variant="flat" size="sm">
                 {tag}
             </Chip>
         ))}

@@ -1,6 +1,7 @@
 'use server';
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+
 import BASE_URL from '../utils/baseurl';
 import xss from 'xss';
 
@@ -20,7 +21,7 @@ const sanitizeFormData = (formData: FormData) => {
         if ( Array.isArray(value) || key === 'tags') {
             continue;
         }
-        if (typeof value === 'string' && value.trim() === '') {
+        if (value == null) {
             continue;
         }
         // convert the value to a boolean if the key is completed or active
@@ -32,7 +33,7 @@ const sanitizeFormData = (formData: FormData) => {
             }
             continue;
         } else {
-            sanitizedValue = xss(String(sanitizedValue));
+            sanitizedValue = xss(String(value));
         }
         sanitizedData[key] = sanitizedValue ?? '';
     }
@@ -50,11 +51,11 @@ const sanitizeFormData = (formData: FormData) => {
 
     console.log('Sanitized Data: ', sanitizedData);
     // remove any empty values from the object
-    Object.keys(sanitizedData).forEach((key) => {
-        if (sanitizedData[key] === '' || sanitizedData[key] === undefined) {
-            delete sanitizedData[key];
-        }
-    });
+    // Object.keys(sanitizedData).forEach((key) => {
+    //     if (sanitizedData[key] === '' || sanitizedData[key] === undefined) {
+    //         delete sanitizedData[key];
+    //     }
+    // });
     return sanitizedData;
 }
 
@@ -112,9 +113,9 @@ const ValidateGroup = async (prevState: any, formData: FormData) => {
     // Get the JSON response
     await res.json();
     // Revalidate the cache
-    revalidatePath('/project', 'layout');
+    revalidatePath('/project/[slug]', 'layout');
     // Redirect to the home page
-    redirect('/project');
+    //redirect('/project');
 
 }
 
@@ -140,8 +141,8 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
     }
     // Get the JSON response
     await res.json();
-    revalidatePath('/project', 'layout');
-    redirect('/project');
+    revalidatePath('/project/[slug]', 'layout');
+    redirect(`/project/${slug}`);
 }
 
 export { ValidateGroup, ValidateTask, ValidateProject };

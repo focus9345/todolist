@@ -75,7 +75,8 @@ const DueDate: React.FC<DueDateProps> = ({ duedate }) => {
           )}
         >
           <p className="text-tiny">
-            {daysLeft && daysLeft < 0 ? "Overdue - " : "Days Left - "}
+            {Math.abs(daysLeft ?? 0)}
+            {daysLeft && daysLeft < 0 ? " Days Overdue - " : " Days Left - "}
             {dueDate
               ? formatted.format(dueDate.toDate(getLocalTimeZone()))
               : ""}

@@ -12,6 +12,7 @@ import {
   SelectItem,
 } from "@heroui/react";
 import FormSubmit from "./formsubmit";
+import { useParams } from "next/navigation";
 import { ValidateTask } from "../../libs/actions";
 import {
   today,
@@ -39,19 +40,21 @@ const initialState: TaskFormState = {
 };
 async function taskAction(
   prevState: TaskFormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<TaskFormState> {
   // Existing task logic
   const result = await ValidateTask(prevState, formData);
   return {
-    message: result?.message || "Success!", // Default message
+    message: result?.message || "Error", // Default message
     errors: result?.errors,
     isError: result?.isError || false, // Adjust this based on your logic
   };
 }
 
 const AddTask: React.FC = () => {
+  //replace this with utility function
   const [date] = React.useState(today(getLocalTimeZone()));
+  const { slug } = useParams();
 
   const [state, formAction] = useActionState<TaskFormState, FormData>(
     taskAction,
@@ -97,7 +100,7 @@ const AddTask: React.FC = () => {
                 </p>
               </div>
             )}
-      <h3 className="text-sm pb-2 font-semibold">Add a New Task</h3>
+      <h3 className="text-sm pb-2 font-semibold">Add a New Task for { slug } </h3>
       <Form
         className="w-full max-w-xs"
         validationErrors={errors}

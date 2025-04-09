@@ -1,12 +1,13 @@
 import React from "react";
 import { TaskPriority } from "../../types/types";
-import {
-  FaCloud,
-  FaCloudRain,
-  FaCloudShowersHeavy,
-  FaCloudBolt,
-  FaFlask,
-} from "react-icons/fa6";
+// import {
+//   FaCloud,
+//   FaCloudRain,
+//   FaCloudShowersHeavy,
+//   FaCloudBolt,
+//   FaFlask,
+// } from "react-icons/fa6";
+import { LuZapOff, LuTarget, LuRadioTower, LuRadiation, LuSiren } from "react-icons/lu";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/react";
 /**
  * Priority shows users the priority of a task.
@@ -19,24 +20,24 @@ function AssignIcon(priority: TaskPriority) {
   let bgcolor = "bg-primary-300";
   switch (priority) {
     case TaskPriority.low:
-      icon = <FaCloud />;
+      icon = <LuTarget />;
       bgcolor = "bg-yellow-700";
       break;
     case TaskPriority.medium:
-      icon = <FaCloudRain />;
+      icon = <LuRadioTower />;
       bgcolor = "bg-orange-700";
       break;
     case TaskPriority.high:
-      icon = <FaCloudShowersHeavy />;
+      icon = <LuSiren />;
       bgcolor = "bg-fuchsia-700";
       break;
     case TaskPriority.critical:
-      icon = <FaCloudBolt />;
+      icon = <LuRadiation />;
       bgcolor = "bg-rose-700";
       break;
 
     default:
-      icon = <FaFlask />;
+      icon = <LuZapOff />;
       bgcolor = "bg-primary-300";
       break;
   }
