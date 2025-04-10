@@ -2,7 +2,7 @@
 import React, { useActionState } from "react";
 import { Form, Input, Textarea, Switch} from "@heroui/react";
 import FormSubmit from "./formsubmit";
-import { ValidateGroup } from "../../libs/actions";
+import HandleSubmit from "../../libs/actions";
 import { cn } from "../../utils/clsxtw";
 
 /**
@@ -24,7 +24,8 @@ const initialState: GroupFormState = {
 
 async function groupAction(prevState: GroupFormState, formData: FormData): Promise<GroupFormState> {
   // Existing group logic
-  const result = await ValidateGroup(prevState, formData);
+  formData.append('type', 'group');
+  const result = await HandleSubmit(prevState, formData);
   return {
     message: result?.message || "Success!",
     errors: result?.errors || {},

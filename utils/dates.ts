@@ -1,4 +1,5 @@
 import {
+    DateValue,
     CalendarDate,
     getLocalTimeZone,
     parseDate,
@@ -21,7 +22,7 @@ const validateDate = (date: CalendarDate): boolean => {
     return true;
 };
 // This function will return the current date and time in the local time zone
-const CreateDate = (): CalendarDate => {
+const CreateDate = (): DateValue => {
     const date = today(getLocalTimeZone());
     if (!validateDate(date)) {
         throw new Error("Unable to create the date");
@@ -29,7 +30,7 @@ const CreateDate = (): CalendarDate => {
     return date;
 };
 // This function will return the current date as a string in the local time zone
-const FormatDate = (date: string | CalendarDate): string => {
+const FormatDate = (date: string | DateValue): string => {
     const caldate: CalendarDate = date instanceof CalendarDate ? date : parseDate(date);
     if (!validateDate(caldate)) {
         throw new Error("Invalid date input, if you are using a string make sure it is in the format 'YYYY-MM-DD'");
@@ -38,7 +39,7 @@ const FormatDate = (date: string | CalendarDate): string => {
     return dateFormatter.format(caldate.toDate(getLocalTimeZone()));
 };
 
-const DateParts = (date: string | CalendarDate): Intl.DateTimeFormatPart[] => {
+const DateParts = (date: string | DateValue): Intl.DateTimeFormatPart[] => {
     const caldate: CalendarDate = date instanceof CalendarDate ? date : parseDate(date);
     if (!validateDate(caldate)) {
         throw new Error("Invalid date input, if you are using a string make sure it is in the format 'YYYY-MM-DD'");
@@ -47,8 +48,17 @@ const DateParts = (date: string | CalendarDate): Intl.DateTimeFormatPart[] => {
     return dateFormatter.formatToParts(caldate.toDate(getLocalTimeZone()));
 };
 
-const DateMonthDay = (date: string | CalendarDate): string[] => {
-    const caldate: CalendarDate = date instanceof CalendarDate ? date : parseDate(date);
+const DueDateDefault = (): DateValue => {
+    const date = CreateDate();
+    const duedate: CalendarDate = date.add({ days: 7 }) as CalendarDate;
+    if (!validateDate(duedate)) {
+        throw new Error("Unable to create the date");
+    }
+    return duedate;
+};
+
+const DateMonthDay = (date: string | DateValue): string[] => {
+    const caldate: DateValue = date instanceof CalendarDate ? date : parseDate(typeof date === "string" ? date : "");
     if (!validateDate(caldate)) {
         throw new Error("Invalid date input, if you are using a string make sure it is in the format 'YYYY-MM-DD'");
     };
@@ -57,4 +67,4 @@ const DateMonthDay = (date: string | CalendarDate): string[] => {
     return [month, day];
 };
 
-export { CreateDate, FormatDate, DateParts, DateMonthDay };
+export { CreateDate, FormatDate, DateParts, DateMonthDay, DueDateDefault };

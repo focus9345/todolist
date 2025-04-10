@@ -2,7 +2,7 @@
 import React, { useActionState } from "react";
 import { Form, Input, Textarea, Switch } from "@heroui/react";
 import FormSubmit from "./formsubmit";
-import { ValidateProject } from "../../libs/actions";
+import HandleSubmit from "../../libs/actions";
 import { cn } from "../../utils/clsxtw";
 
 /**
@@ -26,7 +26,8 @@ async function projectAction(
   prevState: ProjectFormState,
   formData: FormData
 ): Promise<ProjectFormState> {
-  const result = await ValidateProject(prevState, formData);
+  formData.append('type', 'project');
+  const result = await HandleSubmit(prevState, formData);
   
   return {
     message: result?.message || "Success!",

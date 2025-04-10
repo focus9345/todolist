@@ -1,10 +1,8 @@
 'use server';
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-
 import BASE_URL from '../utils/baseurl';
 import xss from 'xss';
-
 
 // used to prevent xss attacks
 const sanitizeFormData = (formData: FormData) => {
@@ -57,6 +55,38 @@ const sanitizeFormData = (formData: FormData) => {
     //     }
     // });
     return sanitizedData;
+}
+
+const HandleSubmit = async ( prevState: any, formData: FormData) => {
+    const type = formData.get('type');
+    formData.delete('type');
+    // sanitize the form data
+    const formDataEntries: Record<string, any> = sanitizeFormData(formData);
+    // create a request Init object
+    const reqInit: RequestInit = { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formDataEntries),
+    };
+    // Call the API to save the project
+    const res = await fetch(BASE_URL + '/api/' + type, reqInit);
+    // Check if the response is ok
+    if (!res.ok) {
+        const whyfail = await res.json();
+        const failMessage: string = whyfail.message.message;
+        const failErrors: object = whyfail.message.errors;
+        return { message: failMessage, errors: failErrors,  isError: true };
+    }
+    // Get the JSON response
+    const { slug } = await res.json();
+    // Revalidate the cache
+    revalidatePath('/project', 'layout');
+    // Redirect to the home page
+    if (type === 'project') {
+        redirect(`/project/${slug}`);
+    } 
+    return { message: 'Success', errors: {}, isError: false };
+
 }
 
 // Below can be reduced to one function. need to pass API fetch destination as parameter.
@@ -141,8 +171,8 @@ const ValidateTask = async (prevState: any, formData: FormData) => {
     }
     // Get the JSON response
     await res.json();
-    revalidatePath('/project/[slug]', 'layout');
-    redirect(`/project/${slug}`);
+    revalidatePath('/project/demo-1', 'layout');
+    //redirect(`/project/${slug}`);
 }
 
-export { ValidateGroup, ValidateTask, ValidateProject };
+export { ValidateGroup, ValidateTask, ValidateProject, HandleSubmit};
