@@ -1,6 +1,5 @@
 "use client";
-import React, { useActionState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import React, { useActionState } from "react";
 import {
   Form,
   Input,
@@ -16,10 +15,11 @@ import {
 import FormSubmit from "./formsubmit";
 import HandleSubmit from "../../libs/actions";
 import { DueDateDefault } from "../../utils/dates";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DateValue } from "@internationalized/date";
-//import { useDateFormatter } from "@react-aria/i18n";
 import { TaskStatus, TaskPriority, TaskTags } from "../../types/types";
 import { cn } from "../../utils/clsxtw";
+import { TaskModelType } from "../../models/task";
 
 /**
  * Component will add a new task.
@@ -28,7 +28,7 @@ import { cn } from "../../utils/clsxtw";
  */
 interface TaskFormState {
   message: string;
-  errors: any;
+  errors: TaskModelType | any;  
   isError: boolean;
 }
 const initialState: TaskFormState = {
@@ -43,16 +43,19 @@ async function taskServerAction(
   prevState: TaskFormState,
   formData: FormData  
 ): Promise<TaskFormState> {
-    // tell the handler what type of form it is
-    formData.append("type", "task");
+    
     // sanitize the form data
-    const formDataEntries: Record<string, any> =await HandleSubmit(prevState, formData);
+    const formDataEntries: TaskFormState = await HandleSubmit(prevState, formData);
     return {
-      message: formDataEntries?.message || "Success!",
-      errors: formDataEntries?.errors || {},
-      isError: formDataEntries?.isError || false,
+      message: formDataEntries?.message,
+      errors: formDataEntries?.errors,
+      isError: formDataEntries?.isError,
     };
 }
+
+
+
+
 
 
 
@@ -77,15 +80,30 @@ const AddTask: React.FC = () => {
     initialState
   );
   const [valueDueDate, setValueDueDate] = React.useState<DateValue | null>(DueDateDefault());
-  const router = useRouter();
+  const [errors, setErrors] = React.useState<any>({});
+  const queryClient = useQueryClient();
+  const createTaskMutation = useMutation((formData: FormData) => dispatch(formData), {
+    onSuccess: (data) => {
+      // Handle success
+      console.log("Task Created Successfully", data);
+      queryClient.invalidateQueries({ queryKeys: ["tasks"] });
+    }
+  });
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
+
+  const handleSubmit = async (formData: FormData) => {
+    //event.preventDefault();
+    //const formData = new FormData(event.currentTarget as HTMLFormElement);
     // Call the action with the form data
-    const result = await dispatch(formData);
-    console.log(result);
-    router.refresh();
+    // tell the handler what type of form it is
+    formData.append("type", "task");
+    createTaskMutation.mutate(formData);
+
+    //await dispatch(formData);
+    //queryClient.invalidateQueries(["tasks"]);
+    // console.log("Add Task Form Submitted");
+    // console.log(result);
+    // router.refresh();
   };
 
   //replace this with utility function
@@ -95,22 +113,22 @@ const AddTask: React.FC = () => {
   //   initialState
   // );
 
-  // const [errors, setErrors] = React.useState<any>({});
+   
   // //const [isActive, setIsActive] = React.useState(true);
   // //replace this with util function
   // const [valueDueDate, setValueDueDate] = React.useState<DateValue | null>(
   //   date.add({ days: 4 })
   // );
-  // React.useEffect(() => {
-  //   if (state.errors) {
-  //     Object.keys(state.errors).forEach((key) => {
-  //       setErrors((prev: any) => ({
-  //         ...prev,
-  //         [key]: state.errors[key].message,
-  //       }));
-  //     });
-  //   }
-  // }, [state.errors]);
+  React.useEffect(() => {
+    if (state.errors) {
+      Object.keys(state.errors).forEach((key) => {
+        setErrors((prev: any) => ({
+          ...prev,
+          [key]: state.errors[key].message,
+        }));
+      });
+    }
+  }, [state.errors]);
 
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
@@ -118,14 +136,16 @@ const AddTask: React.FC = () => {
       <Form
         className="w-full max-w-xs"
         validationBehavior="aria"
-        validationErrors={state.errors}
-        onSubmit={handleSubmit}
+        validationErrors={errors}
+        //onSubmit={handleSubmit}
+        action={(formData: FormData) => handleSubmit(formData)}
         //action={(formData: FormData) => formAction(formData)}
       >
         <Input
           className="max-w-xs"
           description="Enter a task name"
           isRequired
+          errorMessage="Please enter a valid task name"
           label="Task Name"
           labelPlacement="inside"
           name="title"
@@ -220,7 +240,7 @@ const AddTask: React.FC = () => {
           <div
             className={cn(
               state.isError ? "bg-red-800" : "bg-green-800",
-              "text-center rounded-md my-3 p-2 text-white text-sm"
+              "text-center rounded-md my-3 p-2 text-white text-sm w-full"
             )}
           >
             <p>

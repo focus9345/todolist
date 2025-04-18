@@ -23,10 +23,19 @@ interface ITaskSchema {
 interface AddMonthsFunction {
     (date: Date, monthsToAdd: number): Date;
 }
+interface AddDaysFunction {
+    (date: Date, daysToAdd: number): Date;
+}
 
 const addMonths: AddMonthsFunction = (date, monthsToAdd) => {
     const newDate = new Date(date);
     newDate.setMonth(newDate.getMonth() + monthsToAdd);
+    return newDate;
+};
+
+const addDays: AddDaysFunction = (date, daysToAdd) => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + daysToAdd);
     return newDate;
 };
 
@@ -61,8 +70,9 @@ const taskSchema: Schema<ITaskSchema> = new mongoose.Schema({
     deadline: {
         type: Date,
         min: [new Date(), 'Deadline must be in the future'],
-        max: [addMonths((new Date()), 2), 'Deadline must up to two months in the future'],
-        required: false,
+        max: [addMonths((new Date()), 3), 'Deadline must up to three months in the future'],
+        required: [true, 'Please provide a deadline'],
+        default: addDays((new Date()), 7),
     },
     priority: {
         type: String,

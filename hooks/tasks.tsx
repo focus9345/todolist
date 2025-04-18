@@ -1,6 +1,7 @@
 'use client';
 import { useQuery } from "@tanstack/react-query";
 import { TaskModelType } from "../models/task";
+//import { unstable_cache } from "next/cache";
 import BASE_URL from "../utils/baseurl";
 
 interface FetchTasksResponse {
@@ -20,11 +21,15 @@ const fetchTasks = async (groupId: string): Promise<TaskModelType[]> => {
 };
 
   const useTasksData = (groupId: string) => {
+
     return useQuery<TaskModelType[]>({
         queryKey: ["tasks"], // Query key
         queryFn: () => fetchTasks(groupId),
         enabled: !!groupId,
-        staleTime: 1000 * 60 * 30, // 30 minutes
+        //cacheTime: 1000 * 60 * 10, // 10 minutes
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        
+
       });
   }
 

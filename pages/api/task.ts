@@ -24,10 +24,10 @@ export default async function handler(
                 res.statusCode = 200;
                 res.end(JSON.stringify({ message: 'Task Found', data: tasks }));
                 break;
-            } catch (error) {
-                console.error(error);
+            } catch (err) {
                 res.statusCode = 400;
-                res.end(JSON.stringify({ message: 'Task Failed to Get' }));
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                res.end(JSON.stringify( {message: errorMessage}) || JSON.stringify({ message: 'Task Failed to Get' }));
                 break;
             }  
         case 'POST':
@@ -39,12 +39,13 @@ export default async function handler(
                 // temp until groups are chosen in form.
                 const task = await Task.create(newModel);
                 res.statusCode = 201;
-                res.end(JSON.stringify({ message: 'Task Created', data: [task] }));
+                res.end(JSON.stringify({ message: `${task.title} Task Was Created`, data: [task] }));
                 break;
-            } catch (error) {
-                console.error(error);
+            } catch (err) {
                 res.statusCode = 400;
-                res.end(JSON.stringify({ message: 'Task Failed to Post' }));
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                res.end(JSON.stringify({ message: errorMessage }) || JSON.stringify({ message: 'Error: Task Failed'}));
+                //res.end(JSON.stringify({ message: 'Task Failed to Post' }));
                 break;
             }     
         default:

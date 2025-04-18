@@ -18,6 +18,7 @@ interface GroupTypeProps {
 // }
 
 const Group: React.FC<GroupTypeProps> = ({ group }) => {
+
   const groupId = String(group._id);
   const {
     data,

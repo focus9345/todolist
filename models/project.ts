@@ -36,7 +36,13 @@ const projectSchema: Schema<IProjectSchema> = new mongoose.Schema({
     },
     slug: {
         type: String,
-        required: true,
+        required: [true, 'Failed to generate slug'],
+        minlength: [3, 'Slug must be at least 3 characters'],
+        max_length: [50, 'Slug cannot be more than 50 characters'],
+        match: [/^[a-zA-Z0-9-]+$/, 'Slug must be alphanumeric'],
+        default: function() {
+            return slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
+        },
         unique: true,
     },
     completed: {
@@ -52,22 +58,37 @@ const projectSchema: Schema<IProjectSchema> = new mongoose.Schema({
     },
     active: {
         type: Boolean,
+        required: true,
         set: (value: string | boolean) => {
             if (typeof value === 'string' && value === 'on') {
                 return true;
             }
             return false;
         },
-        required: true,
+        
     },
 
 }, { timestamps: true, autoIndex: true });
 
-    projectSchema.pre('save', function(next) {
-        this.slug = slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
-        next();
-    });
-    
+projectSchema.pre('save', function(next) {
+    if(this.active == null || typeof this.active === 'string') {
+        if (this.active === 'on') {
+            this.active = true;
+        } else {
+            this.active = false;
+        }
+    }
+    if(this.completed == null || typeof this.completed === 'string') {
+        if (this.completed === 'on') {
+            this.completed = true;
+        } else {   
+            this.completed = false;
+        }
+    }
+    console.log('Pre Save triggered: ' + this.active);
+    next();
+});
+
     type ProjectModelType = InferSchemaType<typeof projectSchema>;
     const Project = mongoose.models.Project || mongoose.model("Project", projectSchema);
     

@@ -18,7 +18,6 @@ interface TaskTypeProps {
 }
 
 const Task: React.FC<TaskTypeProps> = ({ task }) => {
-  console.log("Task: ", task);
 
   return (
     <>

@@ -1,6 +1,4 @@
 "use server";
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import BASE_URL from '../utils/baseurl';
 import xss from 'xss';
 /* 
@@ -19,26 +17,14 @@ const sanitizeFormData = (formData: FormData) => {
     const tags = formData.getAll('tags');
     //lets sanitize the form values
     for (const [key, value] of Object.entries(formValues)) {
-        const newkey = key.replace(/"/g, '');
-        
-        let sanitizedValue;
+        // skip the keys that are not needed
         if ( Array.isArray(value) || key === 'tags') {
             continue;
         }
         if (value == null) {
             continue;
         }
-        // convert the value to a boolean if the key is completed or active
-        if (newkey === 'completed' || newkey === 'active') {
-            if (typeof value === 'string' && value.trim() === 'on') {
-                sanitizedValue = true;
-            } else {
-                sanitizedValue = false;
-            }
-            continue;
-        } else {
-            sanitizedValue = xss(String(value));
-        }
+        const sanitizedValue: string | string[] | boolean | undefined = xss(String(value));
         sanitizedData[key] = sanitizedValue ?? '';
     }
     // special case for tags because they are stored as an array
@@ -55,6 +41,7 @@ const sanitizeFormData = (formData: FormData) => {
     // remove any empty values from the object
     Object.keys(sanitizedData).forEach((key) => {
         if (sanitizedData[key] === '' || sanitizedData[key] === undefined) {
+            console.log('removing key', key, ' sanitizedData[key] ', sanitizedData[key]);
             delete sanitizedData[key];
         }
     });
@@ -62,6 +49,9 @@ const sanitizeFormData = (formData: FormData) => {
 }
 const HandleSubmit = (prevState: any, formData: FormData) => {
     const type = formData.get('type');
+
+    // remove the type from the form data
+
     formData.delete('type');
     // sanitize the form data
     const formDataEntries: Record<string, any> = sanitizeFormData(formData);
@@ -80,16 +70,21 @@ const HandleSubmit = (prevState: any, formData: FormData) => {
             const whyfail = await res.json();
             const failMessage: string = whyfail.message.message;
             const failErrors: object = whyfail.message.errors;
-            return { message: failMessage, errors: failErrors,  isError: true };
+            return { message: failMessage, errors: failErrors, isError: true };
         }
         // Get the JSON response
         const response = await res.json();
-        const slug = response.slug ? response.slug : '';
-        console.log('slug', slug);
-        // Revalidate the cache
-        revalidatePath(`/project/${slug}`, 'page');
-        // Redirect to the project page
-        redirect(`/project/${slug}`);
+
+        if (response.message) {
+            return { message: response.message, errors: {}, isError: false };
+        }
+
+        // const slug = response.slug ? response.slug : '';
+        // console.log('slug', slug);
+        // // Revalidate the cache
+        // revalidatePath(`/project/${slug}`, 'page');
+        // // Redirect to the project page
+        // redirect(`/project/${slug}`);
        
         
     }
