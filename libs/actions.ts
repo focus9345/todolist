@@ -1,6 +1,7 @@
 "use server";
 import BASE_URL from '../utils/baseurl';
 import xss from 'xss';
+
 /* 
     * used to prevent xss attacks
     * 
@@ -10,15 +11,15 @@ import xss from 'xss';
     * @returns isError - boolean with error status
     */
 
-const sanitizeFormData = (formData: FormData) => {
-    const sanitizedData: Record<string, string | string[] | boolean> = {};
+const sanitizeFormData = (formData: FormData): Record<string, string | string[] | boolean | undefined> => {
+    const sanitizedData: Record<string, string | string[] | boolean | undefined> = {};
     const formValues = Object.fromEntries(formData);
     // Special case for tags because they are stored as an array
     const tags = formData.getAll('tags');
     //lets sanitize the form values
     for (const [key, value] of Object.entries(formValues)) {
         // skip the keys that are not needed
-        if ( Array.isArray(value) || key === 'tags') {
+        if (Array.isArray(value) || key === 'tags') {
             continue;
         }
         if (value == null) {
@@ -47,18 +48,18 @@ const sanitizeFormData = (formData: FormData) => {
     });
     return sanitizedData;
 }
-const HandleSubmit = (prevState: any, formData: FormData) => {
+const HandleSubmit = (prevState, formData: FormData) => {
     const type = formData.get('type');
 
     // remove the type from the form data
 
     formData.delete('type');
     // sanitize the form data
-    const formDataEntries: Record<string, any> = sanitizeFormData(formData);
+    const formDataEntries = sanitizeFormData(formData);
 
-    async function handler( formDataEntries: Record<string, any>) {
+    async function handler(formDataEntries: Record<string, string | boolean | string[] | undefined>) {
         // create a request Init object
-        const reqInit: RequestInit = { 
+        const reqInit: RequestInit = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formDataEntries),
@@ -66,11 +67,23 @@ const HandleSubmit = (prevState: any, formData: FormData) => {
         // Call the API to save the project
         const res = await fetch(BASE_URL + '/api/' + type, reqInit);
         // Check if the response is ok
+
         if (!res.ok) {
-            const whyfail = await res.json();
-            const failMessage: string = whyfail.message.message;
-            const failErrors: object = whyfail.message.errors;
-            return { message: failMessage, errors: failErrors, isError: true };
+            const whyFail = await res.json();
+            //console.log('whyfail', JSON.stringify(whyFail));
+            const failMessage: string = whyFail.message ? whyFail.message : 'Error: Failed to Save';
+            // reformat mongoose errors to fit hero form validation
+            const failErrors: object = whyFail.errors.errors ? (
+                Object.keys(whyFail.errors.errors).reduce((acc: any, key: string) => {
+                    const error = whyFail.errors.errors[key];
+                    if (error && error.message) {
+                        acc[key] = [error.message];
+                    }
+                    return acc;
+                }
+                    , {})) : (whyFail.errors ? whyFail.errors : {});
+            prevState = { message: failMessage, errors: failErrors, isError: true };
+            return prevState;
         }
         // Get the JSON response
         const response = await res.json();
@@ -78,17 +91,8 @@ const HandleSubmit = (prevState: any, formData: FormData) => {
         if (response.message) {
             return { message: response.message, errors: {}, isError: false };
         }
-
-        // const slug = response.slug ? response.slug : '';
-        // console.log('slug', slug);
-        // // Revalidate the cache
-        // revalidatePath(`/project/${slug}`, 'page');
-        // // Redirect to the project page
-        // redirect(`/project/${slug}`);
-       
-        
     }
-    return handler(formDataEntries)
+    return handler(formDataEntries);
 
 };
 

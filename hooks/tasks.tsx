@@ -25,9 +25,9 @@ const fetchTasks = async (groupId: string): Promise<TaskModelType[]> => {
     return useQuery<TaskModelType[]>({
         queryKey: ["tasks"], // Query key
         queryFn: () => fetchTasks(groupId),
-        enabled: !!groupId,
+        //enabled: !!groupId,
         //cacheTime: 1000 * 60 * 10, // 10 minutes
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        //staleTime: 1000 * 60 * 5, // 5 minutes
         
 
       });

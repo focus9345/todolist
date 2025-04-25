@@ -1,22 +1,22 @@
 "use client";
-import React, { useActionState } from "react";
+import React, { useState } from "react";
 import {
   Form,
-  Input,
   Textarea,
   DatePicker,
+  Input,
   //RadioGroup,
   //Radio,
   //CheckboxGroup,
   //Checkbox,
   Select,
   SelectItem,
+  DateValue,
 } from "@heroui/react";
 import FormSubmit from "./formsubmit";
 import HandleSubmit from "../../libs/actions";
-import { DueDateDefault } from "../../utils/dates";
+import { DueDateDefault, DateString, CreateDate } from "../../utils/dates";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { DateValue } from "@internationalized/date";
 import { TaskStatus, TaskPriority, TaskTags } from "../../types/types";
 import { cn } from "../../utils/clsxtw";
 import { TaskModelType } from "../../models/task";
@@ -27,108 +27,111 @@ import { TaskModelType } from "../../models/task";
  *
  */
 interface TaskFormState {
-  message: string;
-  errors: TaskModelType | any;  
+  message: string | undefined;
+  errors: Record<string, string | string[]> | undefined;
   isError: boolean;
 }
+
 const initialState: TaskFormState = {
   message: "",
   errors: {},
   isError: false,
 };
 
-
 // Server Form Action
 async function taskServerAction(
   prevState: TaskFormState,
-  formData: FormData  
+  formData: FormData
 ): Promise<TaskFormState> {
-    
-    // sanitize the form data
-    const formDataEntries: TaskFormState = await HandleSubmit(prevState, formData);
-    return {
-      message: formDataEntries?.message,
-      errors: formDataEntries?.errors,
-      isError: formDataEntries?.isError,
-    };
+  // submit the form data to the server
+  const formDataEntries: TaskFormState = await HandleSubmit(
+    prevState,
+    formData
+  );
+  //console.log("Task Server Action", formDataEntries);
+  return formDataEntries;
 }
 
-
-
-
-
-
-
-// async function taskAction(
-//   prevState: TaskFormState,
-//   formData: FormData
-// ): Promise<TaskFormState> {
-//   // set formtype
-//   formData.append("type", "task");
-//   // Existing task logic
-//   const result = await HandleSubmit(prevState, formData);
-//   return {
-//     message: result?.message || "Error", // Default message
-//     errors: result?.errors,
-//     isError: result?.isError || false, // Adjust this based on your logic
-//   };
-// }
-
 const AddTask: React.FC = () => {
-  const [state, dispatch] = useActionState<TaskFormState, FormData>(
-    taskServerAction,
-    initialState
+  // console.log("props to show errors", props.errorMessage)
+  const [valueDueDate, setValueDueDate] = useState<DateValue | null>(
+    DueDateDefault()
   );
-  const [valueDueDate, setValueDueDate] = React.useState<DateValue | null>(DueDateDefault());
-  const [errors, setErrors] = React.useState<any>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = React.useState<TaskFormState["errors"]>(
+    initialState.errors
+  );
   const queryClient = useQueryClient();
-  const createTaskMutation = useMutation((formData: FormData) => dispatch(formData), {
-    onSuccess: (data) => {
-      // Handle success
-      console.log("Task Created Successfully", data);
-      queryClient.invalidateQueries({ queryKeys: ["tasks"] });
-    }
+  const taskMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const result = await taskServerAction(initialState, formData);
+      return result;
+    },
+    mutationKey: ["tasks"],
+    onMutate: async (newFormData: FormData) => {
+      // Optimistically update the cache with the new task
+      await queryClient.cancelQueries({ queryKey: ["tasks"] });
+      const previousTasks = queryClient.getQueryData<TaskModelType[]>([
+        "tasks",
+      ]);
+      if (previousTasks) {
+        queryClient.setQueryData(["tasks"], (old: TaskModelType[]) => [
+          ...old,
+          newFormData,
+        ]);
+      }
+      return { previousTasks };
+    },
+    onSuccess: async (): Promise<void> => {
+      // Handle success: this will update the state so that the mutation becomes visible to the user
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+    onError: (error, newFormData, context) => {
+      // Rollback the optimistic update in case of error
+      queryClient.setQueryData(["tasks"], context?.previousTasks);
+      // Optionally, you can show an error message to the user
+      throw new Error("Error creating task", error);
+    },
+  
   });
+  interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {
+    currentTarget: HTMLFormElement;
+  }
 
-
-  const handleSubmit = async (formData: FormData) => {
-    //event.preventDefault();
-    //const formData = new FormData(event.currentTarget as HTMLFormElement);
-    // Call the action with the form data
-    // tell the handler what type of form it is
-    formData.append("type", "task");
-    createTaskMutation.mutate(formData);
-
-    //await dispatch(formData);
-    //queryClient.invalidateQueries(["tasks"]);
-    // console.log("Add Task Form Submitted");
-    // console.log(result);
-    // router.refresh();
+  const handleSubmit = async (event: HandleSubmitEvent): Promise<void> => {
+    event.preventDefault();
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      const formData = new FormData(event.currentTarget);
+      // Append the type to the form data
+      formData.append("type", "task");
+      try {
+        // Call the server action to handle the form submission
+        await taskMutation.mutateAsync(formData);
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        if (taskMutation.data) {
+          taskMutation.data.message = "Error submitting form";
+          taskMutation.data.isError = true;
+        }
+        setTimeout(() => {
+          taskMutation.data = initialState;
+        }, 4000);
+      } finally {
+        setIsSubmitting(false);
+        
+      }
+    }
   };
 
-  //replace this with utility function
-  // const [date] = React.useState(today(getLocalTimeZone()));
-  // const [state, formAction] = useActionState<TaskFormState, FormData>(
-  //   taskAction,
-  //   initialState
-  // );
-
-   
-  // //const [isActive, setIsActive] = React.useState(true);
-  // //replace this with util function
-  // const [valueDueDate, setValueDueDate] = React.useState<DateValue | null>(
-  //   date.add({ days: 4 })
-  // );
   React.useEffect(() => {
-    if (state.errors) {
-      Object.keys(state.errors).forEach((key) => {
-        setErrors((prev: any) => ({
-          ...prev,
-          [key]: state.errors[key].message,
+      if (taskMutation.data) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          ...taskMutation.data.errors, // Spread only the errors object
         }));
-      });
-    }
-  }, [state.errors]);
+      }
+    }, [taskMutation.data]);
 
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
@@ -137,15 +140,16 @@ const AddTask: React.FC = () => {
         className="w-full max-w-xs"
         validationBehavior="aria"
         validationErrors={errors}
-        //onSubmit={handleSubmit}
-        action={(formData: FormData) => handleSubmit(formData)}
-        //action={(formData: FormData) => formAction(formData)}
+        onSubmit={handleSubmit}
+
+        //action={(formData: FormData) => handleSubmit(formData)}
       >
         <Input
           className="max-w-xs"
           description="Enter a task name"
           isRequired
-          errorMessage="Please enter a valid task name"
+          // isInvalid={errors?.title ? true : false}
+          // errorMessage={`${errors?.title}`}
           label="Task Name"
           labelPlacement="inside"
           name="title"
@@ -199,8 +203,9 @@ const AddTask: React.FC = () => {
           label="Deadline"
           labelPlacement="inside"
           name="deadline"
-          defaultValue={valueDueDate? valueDueDate : DueDateDefault()}
-          onChange={(valueDueDate) =>
+          minValue={CreateDate()}
+          defaultValue={valueDueDate ? valueDueDate : null}
+          onChange={(valueDueDate: string | null) =>
             valueDueDate && setValueDueDate(valueDueDate)
           }
           size="sm"
@@ -221,7 +226,6 @@ const AddTask: React.FC = () => {
             </SelectItem>
           ))}
         </Select>
-        {/* will need to be a select for users on this project */}
         <Input
           className="max-w-xs"
           value="Fake Name"
@@ -236,21 +240,34 @@ const AddTask: React.FC = () => {
 
         <FormSubmit />
 
-        {state.message && (
-          <div
-            className={cn(
-              state.isError ? "bg-red-800" : "bg-green-800",
-              "text-center rounded-md my-3 p-2 text-white text-sm w-full"
-            )}
-          >
-            <p>
-              {state.isError ? (state.message as string) : `Task Created`}
-              <br /> state isError: {state.isError ? "true" : "false"}
-              <br /> state message: {state.message as string}
-              <br /> state errors: {JSON.stringify(state.errors)}
+        {taskMutation.isPending && (
+          <div className="text-center">
+            <p className="text-sm text-gray-500">Creating Task...</p>
+          </div>
+        )}
+        {taskMutation.isError && (
+          <div className="text-center">
+            <p className="text-sm text-red-600">
+              {(taskMutation.error as Error).message}
             </p>
           </div>
         )}
+        {taskMutation.isSuccess && (
+          <div
+            className={cn(
+              taskMutation.data?.isError ? "bg-red-800" : "bg-green-800",
+              "text-center rounded-md my-3 p-2 text-white text-sm w-full"
+            )}
+          >
+            <p className="text-sm">
+              {taskMutation.data?.message
+                ? taskMutation.data.message
+                : "Task Created Successfully!"} </p>
+                <p>
+            </p>
+          </div>
+        )}
+        
       </Form>
     </section>
   );

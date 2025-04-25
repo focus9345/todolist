@@ -44,7 +44,7 @@ export default async function handler(
             } catch (err) {
                 res.statusCode = 400;
                 const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-                res.end(JSON.stringify({ message: errorMessage }) || JSON.stringify({ message: 'Error: Task Failed'}));
+                res.end(JSON.stringify({ message: errorMessage, errors: err }) || JSON.stringify({ message: 'Task Failed to Post' }));
                 //res.end(JSON.stringify({ message: 'Task Failed to Post' }));
                 break;
             }     
