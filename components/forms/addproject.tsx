@@ -1,11 +1,13 @@
 "use client";
-import React, { useActionState } from "react";
-import { usePathname } from 'next/navigation';
+import React, { useState, useRef } from "react";
+//import { usePathname } from 'next/navigation';
 import { Form, Input, Textarea, Switch } from "@heroui/react";
 import FormSubmit from "./formsubmit";
 import HandleSubmit from "../../libs/actions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "../../utils/clsxtw";
 import { ProjectModelType } from "../../models/project";
+import { FormState } from "../../types/types";
 
 /**
  * Component will add a new project.
@@ -13,73 +15,154 @@ import { ProjectModelType } from "../../models/project";
  *
  */
 
-interface ProjectFormState {
-  message: string;
-  errors: ProjectModelType | any;
-  isError: boolean;
-}
-const initialState: ProjectFormState = {
+const initialState: FormState = {
   message: "",
   errors: {},
   isError: false,
 };
 
 // Server Form Action
-async function taskServerAction(
-  prevState: ProjectFormState,
+async function projectServerAction(
+  prevState: FormState,
   formData: FormData,  
-): Promise<ProjectFormState> {
+): Promise<FormState> {
     
-    // sanitize the form data
-    const formDataEntries: ProjectFormState = await HandleSubmit(prevState, formData);
-    
-    return {
-      message: formDataEntries?.message,
-      errors: formDataEntries?.errors,
-      isError: formDataEntries?.isError,
-    };
+    // submit the form data to the server
+    const formDataEntries: FormState = (await HandleSubmit(
+      prevState,
+      formData
+    )) || { message: "", errors: {}, isError: false };
+    return formDataEntries;
 }
 
 const AddProject: React.FC = () => {
-  const [state, dispatch] = useActionState<ProjectFormState, FormData>(
-    taskServerAction,
-    initialState
-  );
-  const [errors, setErrors] = React.useState<any>({});
+  const formRef = useRef<HTMLFormElement>(null);
+  // //const [state, dispatch] = useActionState<FormState, FormData>(
+  //   projectServerAction,
+  //   initialState
+  // );
+  const [errors, setErrors] = React.useState<FormState["errors"]>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isActive, setIsActive] = React.useState(true);
-  //const router = useRouter();
-  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const projectMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const result = await projectServerAction(initialState, formData);
+      return result;
+    },
+    mutationKey: ["projects"],
+    onMutate: async (newFormData: FormData) => {
+      // Optimistically update the cache with the new item
+      await queryClient.cancelQueries({ queryKey: ["projects"] });
+      const previousGroups = queryClient.getQueryData<ProjectModelType[]>([
+        "projects",
+      ]);
+      if (previousGroups) {
+        queryClient.setQueryData(["projects"], (old: ProjectModelType[]) => [
+          ...old,
+          newFormData,
+        ]);
+      }
+      return { previousGroups };
+    },
+    onSuccess: async (): Promise<void> => {
+      // Handle success: this will update the state so that the mutation becomes visible to the user
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+    onError: (error, newFormData, context) => {
+      // Rollback the optimistic update in case of error
+      queryClient.setQueryData(["projects"], context?.previousGroups);
+      // Optionally, you can show an error message to the user
+      throw new Error("Error creating project", error);
+    },
+  });
+  interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {
+    currentTarget: HTMLFormElement;
+  }
 
-  const handleSubmit = async (formData: FormData, pathname: string | null) => {
-    
-    // tell the handler what type of form it is
-    formData.append("type", "project");
-    formData.append("pathname", pathname ?? "");
-    
-    await dispatch(formData);
-    //router.refresh(); // not working :()
-    //revalidatePath(`${pathname}`, 'page');
-    //redirect(`${pathname}`);
+  const handleSubmit = async (event: HandleSubmitEvent): Promise<void> => {
+    event.preventDefault();
+
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      const formData = new FormData(event.currentTarget);
+      // Append the type to the form data
+      formData.append("type", "project");
+      try {
+        // Call the server action to handle the form submission
+        await projectMutation.mutateAsync(formData);
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        if (projectMutation.data) {
+          projectMutation.data.message = "Error submitting form";
+          projectMutation.data.isError = true;
+        }
+        setTimeout(() => {
+          projectMutation.data = initialState;
+        }, 4000);
+      } finally {
+        setIsSubmitting(false);
+        // Reset the form after submission
+        formRef.current?.reset();
+      }
+    }
   };
 
   React.useEffect(() => {
-    if (state.errors) {
-      Object.keys(state.errors).forEach((key) => {
-        setErrors((prev: any) => ({
-          ...prev,
-          [key]: state.errors[key].message,
-        }));
-      });
+    if (projectMutation.data) {
+      console.log("Group Mutation Data: ", projectMutation.data.errors);
+      setErrors(() => ({
+        ...projectMutation.data.errors, // Spread only the errors object
+      }));
     }
-  }, [state.errors]);
+  }, [projectMutation.data]);
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // const handleSubmit = async (formData: FormData, pathname: string | null) => {
+    
+  //   // tell the handler what type of form it is
+  //   formData.append("type", "project");
+  //   formData.append("pathname", pathname ?? "");
+    
+  //   await dispatch(formData);
+  //   //router.refresh(); // not working :()
+  //   //revalidatePath(`${pathname}`, 'page');
+  //   //redirect(`${pathname}`);
+  // };
+
+  // React.useEffect(() => {
+  //   if (state.errors) {
+  //     Object.keys(state.errors).forEach((key) => {
+  //       setErrors((prev: any) => ({
+  //         ...prev,
+  //         [key]: state.errors[key].message,
+  //       }));
+  //     });
+  //   }
+  // }, [state.errors]);
 
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
       <h3 className="text-sm pb-2 font-semibold">Add a New Project</h3>
       <Form
         className="w-full max-w-xs"
+        validationBehavior="aria"
         validationErrors={errors}
-        action={(formData: FormData) => handleSubmit(formData, pathname)}
+        onSubmit={handleSubmit}
+        ref={formRef}
       >
         <Input
           isRequired
@@ -113,44 +196,37 @@ const AddProject: React.FC = () => {
             {isActive ? "Active" : "Dormant"}
            
           </Switch>
-          {/*
-          <p className="text-tiny text-default-500">
-            Selected: {isSelectedAct ? "true" : "false"}
-          </p>
-          
+
         </div>
-        <div className="flex flex-col gap-2">
-          <Switch
-            name="completed"
-            size="sm"
-            isSelected={isCompleted}
-            value={isCompleted ? "on" : "off"}
-            onValueChange={setIsCompleted}
-          >
-            Completed
-          </Switch>
-          
-          <p className="text-tiny text-default-500">
-            Selected: {isSelectedCom ? "true" : "false"}
-          </p>
-          */}
-        </div>
-        {state.message && (
-          <div
-            className={cn(
-              state.isError ? "bg-red-800" : "bg-green-800",
-              "text-center rounded-md my-3 p-2 text-white text-sm"
-            )}
-          >
-            <p>
-              {state.isError ? (state.message as string) : `Project Created`}
-              <br /> state isError: {state.isError ? "true" : "false"}
-              <br /> state message: {state.message as string}
-              <br /> state errors: {JSON.stringify(state.errors)}
-            </p>
-          </div>
-        )}
+        
         <FormSubmit />
+        {projectMutation.isPending && (
+                  <div className="text-center">
+                    <p className="text-sm text-gray-500">Creating Group...</p>
+                  </div>
+                )}
+                {projectMutation.isError && (
+                  <div className="text-center">
+                    <p className="text-sm text-red-600">
+                      {(projectMutation.error as Error).message}
+                    </p>
+                  </div>
+                )}
+                {projectMutation.isSuccess && (
+                  <div
+                    className={cn(
+                      projectMutation.data?.isError ? "bg-red-800" : "bg-green-800",
+                      "text-center rounded-md my-3 p-2 text-white text-sm w-full"
+                    )}
+                  >
+                    <p className="text-sm">
+                      {projectMutation.data?.message
+                        ? projectMutation.data.message
+                        : "Group Created Successfully!"}{" "}
+                    </p>
+                    <p></p>
+                  </div>
+                )}
       </Form>
     </section>
   );

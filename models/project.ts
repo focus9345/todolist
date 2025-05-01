@@ -36,13 +36,7 @@ const projectSchema: Schema<IProjectSchema> = new mongoose.Schema({
     },
     slug: {
         type: String,
-        required: [true, 'Failed to generate slug'],
-        minlength: [3, 'Slug must be at least 3 characters'],
-        max_length: [50, 'Slug cannot be more than 50 characters'],
-        match: [/^[a-zA-Z0-9-]+$/, 'Slug must be alphanumeric'],
-        default: function() {
-            return slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
-        },
+        slug: "title",
         unique: true,
     },
     completed: {
@@ -85,7 +79,10 @@ projectSchema.pre('save', function(next) {
             this.completed = false;
         }
     }
-    console.log('Pre Save triggered: ' + this.active);
+    if (this.slug == null && this.title != null) {
+        this.slug = slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
+    }
+    //console.log('Pre Save triggered: ' + this.active);
     next();
 });
 
