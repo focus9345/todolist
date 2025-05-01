@@ -14,7 +14,7 @@ const fetchTasks = async (groupId: string): Promise<TaskModelType[]> => {
         headers: { "Content-Type": "application/json" },
     });
     if (!response.ok) {
-        throw new Error(`Error fetching groups: ${response.statusText}`);
+        throw new Error(`Error fetching tasks: ${response.statusText}`);
     }
     const data: FetchTasksResponse = await response.json();
     return data.data;

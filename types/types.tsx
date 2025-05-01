@@ -53,6 +53,16 @@ export enum UserRoles {
     user = 'user',
     guest = 'guest',
 }
+// FormState is used to manage error messages
+export interface FormState {
+    message: string;
+    errors: Record<string, string | string[]>;
+    isError: boolean;
+}
+
+
+// Older type efforts fo application
+
 // export type to define the type of the data for ISO 8601 date string
 // export type TYear = `${number}${number}${number}${number}`;
 // export type TMonth = `${number}${number}`;

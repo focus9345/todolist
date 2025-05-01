@@ -29,7 +29,7 @@ const fetchGroups = async (projectId: string): Promise<ProjectModelType[]> => {
         // and only runs when projectId is available
         // This is useful for dynamic queries
         // and prevents unnecessary network requests
-        staleTime: 1000 * 60 * 30, // 30 minutes
+        // taleTime: 1000 * 60 * 30, // 30 minutes
       });
   }
 

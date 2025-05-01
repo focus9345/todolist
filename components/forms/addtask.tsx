@@ -1,66 +1,52 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Form,
   Textarea,
   DatePicker,
   Input,
-  //RadioGroup,
-  //Radio,
-  //CheckboxGroup,
-  //Checkbox,
   Select,
   SelectItem,
   DateValue,
 } from "@heroui/react";
 import FormSubmit from "./formsubmit";
 import HandleSubmit from "../../libs/actions";
-import { DueDateDefault, DateString, CreateDate } from "../../utils/dates";
+import { DueDateDefault, CreateDate } from "../../utils/dates";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { TaskStatus, TaskPriority, TaskTags } from "../../types/types";
+import { TaskStatus, TaskPriority, TaskTags, FormState } from "../../types/types";
 import { cn } from "../../utils/clsxtw";
 import { TaskModelType } from "../../models/task";
-
 /**
  * Component will add a new task.
  *
  *
  */
-interface TaskFormState {
-  message: string | undefined;
-  errors: Record<string, string | string[]> | undefined;
-  isError: boolean;
-}
 
-const initialState: TaskFormState = {
-  message: "",
+
+const initialState: FormState = {
+  message: "", // Ensure message is always a string
   errors: {},
   isError: false,
 };
 
 // Server Form Action
 async function taskServerAction(
-  prevState: TaskFormState,
+  prevState: FormState,
   formData: FormData
-): Promise<TaskFormState> {
+): Promise<FormState> {
   // submit the form data to the server
-  const formDataEntries: TaskFormState = await HandleSubmit(
+  const formDataEntries: FormState = (await HandleSubmit(
     prevState,
     formData
-  );
-  //console.log("Task Server Action", formDataEntries);
+  )) || { message: "", errors: {}, isError: false };
   return formDataEntries;
 }
 
 const AddTask: React.FC = () => {
-  // console.log("props to show errors", props.errorMessage)
-  const [valueDueDate, setValueDueDate] = useState<DateValue | null>(
-    DueDateDefault()
-  );
+  const formRef = useRef<HTMLFormElement>(null);
+  const [valueDueDate, setValueDueDate] = useState<DateValue>(DueDateDefault());
+  const [errors, setErrors] = React.useState<FormState["errors"]>(initialState.errors);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = React.useState<TaskFormState["errors"]>(
-    initialState.errors
-  );
   const queryClient = useQueryClient();
   const taskMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -100,6 +86,7 @@ const AddTask: React.FC = () => {
 
   const handleSubmit = async (event: HandleSubmitEvent): Promise<void> => {
     event.preventDefault();
+    
     if (!isSubmitting) {
       setIsSubmitting(true);
       const formData = new FormData(event.currentTarget);
@@ -119,15 +106,16 @@ const AddTask: React.FC = () => {
         }, 4000);
       } finally {
         setIsSubmitting(false);
-        
+        // Reset the form after submission
+        formRef.current?.reset();
       }
     }
   };
 
   React.useEffect(() => {
       if (taskMutation.data) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
+        setErrors(() => ({
+ 
           ...taskMutation.data.errors, // Spread only the errors object
         }));
       }
@@ -141,8 +129,7 @@ const AddTask: React.FC = () => {
         validationBehavior="aria"
         validationErrors={errors}
         onSubmit={handleSubmit}
-
-        //action={(formData: FormData) => handleSubmit(formData)}
+        ref={formRef}
       >
         <Input
           className="max-w-xs"
@@ -175,7 +162,7 @@ const AddTask: React.FC = () => {
           isRequired
         >
           {Object.values(TaskStatus).map((status: string) => (
-            <SelectItem key={status} value={status}>
+            <SelectItem key={status}>
               {status}
             </SelectItem>
           ))}
@@ -189,7 +176,7 @@ const AddTask: React.FC = () => {
           isRequired
         >
           {Object.values(TaskPriority).map((priority: string) => (
-            <SelectItem key={priority} value={priority}>
+            <SelectItem key={priority}>
               {priority}
             </SelectItem>
           ))}
@@ -204,8 +191,8 @@ const AddTask: React.FC = () => {
           labelPlacement="inside"
           name="deadline"
           minValue={CreateDate()}
-          defaultValue={valueDueDate ? valueDueDate : null}
-          onChange={(valueDueDate: string | null) =>
+          defaultValue={valueDueDate ? valueDueDate : CreateDate()}
+          onChange={(valueDueDate) =>
             valueDueDate && setValueDueDate(valueDueDate)
           }
           size="sm"
@@ -220,8 +207,8 @@ const AddTask: React.FC = () => {
           selectionMode="multiple"
           isRequired
         >
-          {Object.values(TaskTags).map((tag: string) => (
-            <SelectItem key={tag} value={tag}>
+          {Object.values(TaskTags).map((tag) => (
+            <SelectItem key={tag}>
               {tag}
             </SelectItem>
           ))}

@@ -1,5 +1,6 @@
 import mongoose, { Schema, InferSchemaType  } from "mongoose";
 import { DataTypes } from "../types/types";
+import slugify from 'slugify';
 // import slugify from 'slugify';
 
 interface IGroupSchema {
@@ -27,7 +28,7 @@ const groupSchema: Schema<IGroupSchema> = new mongoose.Schema({
         minlength: [3, 'Title must be at least 3 characters'],
         max_length: [50, 'Title cannot be more than 50 characters'],
         match: [/^[a-zA-Z0-9 ]+$/, 'Title must be alphanumeric'],
-        unique: true,
+        unique: [true, 'Title must be unique'],
     },
     description: {
         type: String,
@@ -38,8 +39,7 @@ const groupSchema: Schema<IGroupSchema> = new mongoose.Schema({
     },
     slug: {
         type: String,
-        required: true,
-        unique: true,
+        slug: "title",
     },
     completed: {
         type: Boolean,
@@ -70,10 +70,14 @@ const groupSchema: Schema<IGroupSchema> = new mongoose.Schema({
 
 }, { timestamps: true, autoIndex: true },);
 
-    // groupSchema.pre('save', function(next) {
-    //     this.slug = slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
-    //     next();
-    // });
+// Add pre-save middleware to generate the slug
+groupSchema.pre('save', function (next) {
+    console.log('Pre-save hook triggered for Group model');
+    if (!this.slug && this.title) {
+        this.slug = slugify(this.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
+    }
+    next();
+});
 type GroupModelType = InferSchemaType<typeof groupSchema>;
 const Group = mongoose.models.Group || mongoose.model("Group", groupSchema);
 

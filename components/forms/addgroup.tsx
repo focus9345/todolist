@@ -1,84 +1,135 @@
-'use client';
-import React, { useActionState } from "react";
-import { Form, Input, Textarea, Switch} from "@heroui/react";
+"use client";
+import React, { useState, useRef } from "react";
+import { Form, Input, Textarea, Switch } from "@heroui/react";
 import FormSubmit from "./formsubmit";
 import HandleSubmit from "../../libs/actions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "../../utils/clsxtw";
+import { FormState } from "../../types/types";
+import { GroupModelType } from "../../models/group";
 
 /**
  * Component will add a new group.
  *
  *
  */
-
-interface GroupFormState {
-  message: string;
-  errors: any;
-  isError: boolean;
-}
-const initialState: GroupFormState = {
+const initialState: FormState = {
   message: "",
   errors: {},
   isError: false,
 };
-
-async function groupAction(prevState: GroupFormState, formData: FormData): Promise<GroupFormState> {
-  // Existing group logic
-  formData.append('type', 'group');
-  const result = await HandleSubmit(prevState, formData);
-  return {
-    message: result?.message || "Success!",
-    errors: result?.errors || {},
-    isError: result?.message ? true : false,
-  };
-};
+// Server Form Action
+async function groupServerAction(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  // submit the form data to the server
+  const formDataEntries: FormState = (await HandleSubmit(
+    prevState,
+    formData
+  )) || { message: "", errors: {}, isError: false };
+  return formDataEntries;
+}
 const AddGroup: React.FC = () => {
-
-  const [state, formAction] = useActionState<GroupFormState, FormData>(groupAction, initialState);
-  const [errors, setErrors] = React.useState<any>({});
+  const formRef = useRef<HTMLFormElement>(null);
+  //REMOVE const [state, formAction] = useActionState<FormState, FormData>(groupAction, initialState);
+  const [errors, setErrors] = React.useState<FormState["errors"]>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isActive, setIsActive] = React.useState(true);
-  React.useEffect(() => {
-      if (state.errors) {
-        Object.keys(state.errors).forEach((key) => {
-          setErrors((prev: any) => ({
-            ...prev,
-            [key]: state.errors[key].message,
-          }));
-        });
+  const queryClient = useQueryClient();
+  const groupMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const result = await groupServerAction(initialState, formData);
+      return result;
+    },
+    mutationKey: ["groups"],
+    onMutate: async (newFormData: FormData) => {
+      // Optimistically update the cache with the new item
+      await queryClient.cancelQueries({ queryKey: ["groups"] });
+      const previousGroups = queryClient.getQueryData<GroupModelType[]>([
+        "groups",
+      ]);
+      if (previousGroups) {
+        queryClient.setQueryData(["groups"], (old: GroupModelType[]) => [
+          ...old,
+          newFormData,
+        ]);
       }
-      }, [state.errors]);
+      return { previousGroups };
+    },
+    onSuccess: async (): Promise<void> => {
+      // Handle success: this will update the state so that the mutation becomes visible to the user
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+    },
+    onError: (error, newFormData, context) => {
+      // Rollback the optimistic update in case of error
+      queryClient.setQueryData(["groups"], context?.previousGroups);
+      // Optionally, you can show an error message to the user
+      throw new Error("Error creating group", error);
+    },
+  });
+  interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {
+    currentTarget: HTMLFormElement;
+  }
+
+  const handleSubmit = async (event: HandleSubmitEvent): Promise<void> => {
+    event.preventDefault();
+
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      const formData = new FormData(event.currentTarget);
+      // Append the type to the form data
+      formData.append("type", "group");
+      try {
+        // Call the server action to handle the form submission
+        await groupMutation.mutateAsync(formData);
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        if (groupMutation.data) {
+          groupMutation.data.message = "Error submitting form";
+          groupMutation.data.isError = true;
+        }
+        setTimeout(() => {
+          groupMutation.data = initialState;
+        }, 4000);
+      } finally {
+        setIsSubmitting(false);
+        // Reset the form after submission
+        formRef.current?.reset();
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    if (groupMutation.data) {
+      console.log("Group Mutation Data: ", groupMutation.data.errors);
+      setErrors(() => ({
+        ...groupMutation.data.errors, // Spread only the errors object
+      }));
+    }
+  }, [groupMutation.data]);
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
-      {state.message && (
-        <div
-                  className={cn(
-                    state.isError ? "bg-red-800" : "bg-green-800",
-                    "text-center rounded-md my-3 p-2 text-white text-sm"
-                  )}
-                >
-          <p>
-          {state.isError ? state.message as string : `Group Created`}
-          </p>
-        </div>
-      )}
-    <h3 className="text-sm pb-2 font-semibold">Add a New Group</h3>
-    <Form
-      className="w-full max-w-xs"
-      validationErrors={errors}
-      action={(formData: FormData) => formAction(formData)}
-    >
-      <Input
-        isRequired
-        label="Group Name"
-        className="max-w-xs"
-        labelPlacement="inside"
-        size="sm"
-        variant="faded"
-        name="title"
-        description="Enter unique title for groups in this project"
-        type="text"
-      />
-      <Textarea
+      <h3 className="text-sm pb-2 font-semibold">Add a New Group</h3>
+      <Form
+        className="w-full max-w-xs"
+        validationBehavior="aria"
+        validationErrors={errors}
+        onSubmit={handleSubmit}
+        ref={formRef}
+      >
+        <Input
+          isRequired
+          label="Group Name"
+          className="max-w-xs"
+          labelPlacement="inside"
+          size="sm"
+          variant="faded"
+          name="title"
+          description="Enter unique title for groups in this project"
+          type="text"
+        />
+        <Textarea
           className="max-w-xs"
           description="Enter a description for the group"
           label="Description"
@@ -97,9 +148,36 @@ const AddGroup: React.FC = () => {
           >
             Active
           </Switch>
+        </div>
+        <FormSubmit />
+        {groupMutation.isPending && (
+          <div className="text-center">
+            <p className="text-sm text-gray-500">Creating Group...</p>
           </div>
-      <FormSubmit />
-    </Form>
+        )}
+        {groupMutation.isError && (
+          <div className="text-center">
+            <p className="text-sm text-red-600">
+              {(groupMutation.error as Error).message}
+            </p>
+          </div>
+        )}
+        {groupMutation.isSuccess && (
+          <div
+            className={cn(
+              groupMutation.data?.isError ? "bg-red-800" : "bg-green-800",
+              "text-center rounded-md my-3 p-2 text-white text-sm w-full"
+            )}
+          >
+            <p className="text-sm">
+              {groupMutation.data?.message
+                ? groupMutation.data.message
+                : "Group Created Successfully!"}{" "}
+            </p>
+            <p></p>
+          </div>
+        )}
+      </Form>
     </section>
   );
 };

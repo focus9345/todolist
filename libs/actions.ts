@@ -48,7 +48,15 @@ const sanitizeFormData = (formData: FormData): Record<string, string | string[] 
     });
     return sanitizedData;
 }
-const HandleSubmit = (prevState, formData: FormData) => {
+
+//MAKE THIS A TYPE LATER
+interface PrevState {
+    message: string;
+    errors: Record<string, string | string[]>;
+    isError: boolean;
+}
+
+const HandleSubmit = (prevState: PrevState, formData: FormData) => {
     const type = formData.get('type');
 
     // remove the type from the form data
@@ -70,11 +78,11 @@ const HandleSubmit = (prevState, formData: FormData) => {
 
         if (!res.ok) {
             const whyFail = await res.json();
-            //console.log('whyfail', JSON.stringify(whyFail));
             const failMessage: string = whyFail.message ? whyFail.message : 'Error: Failed to Save';
-            // reformat mongoose errors to fit hero form validation
-            const failErrors: object = whyFail.errors.errors ? (
-                Object.keys(whyFail.errors.errors).reduce((acc: any, key: string) => {
+            console.log('Actions Fail Message: ', failMessage);
+            // reformat mongoose errors to fit heroui form validation
+            const failErrors: Record<string, string | string[]> = whyFail.errors.errors ? (
+                Object.keys(whyFail.errors.errors).reduce((acc: Record<string, string | string[]>, key: string) => {
                     const error = whyFail.errors.errors[key];
                     if (error && error.message) {
                         acc[key] = [error.message];

@@ -3,12 +3,12 @@ import dbConnect from '../../libs/db';
 import Group from '../../models/group';
 import Project from '../../models/project';
 import { GroupModelType } from '../../models/group';
-import slugify from 'slugify';
+//import slugify from 'slugify';
 
 type ResponseData = {
     message?: string,
     data?: GroupModelType[],
-} 
+}
 
 export default async function handler(
     req: NextApiRequest,
@@ -30,15 +30,10 @@ export default async function handler(
                 res.statusCode = 400;
                 res.end(JSON.stringify({ message: 'Group Failed to Get' }));
                 break;
-            }  
+            }
         case 'POST':
             try {
-                const newGroupModel = new Group(req.body);
-                // look  into pre() mongoose to ensure this is done before save
-                if (newGroupModel.slug == null) {
-                                    console.log('Project Slug: ' + newGroupModel.slug);
-                                    newGroupModel.slug = slugify(newGroupModel.title, { lower: true, remove: /[^A-Za-z0-9\s]/g });
-                                }
+                const newGroupModel: GroupModelType = new Group(req.body);
                 // put a legit projectId here
                 const project = await Project.findOne().sort({ field: 'asc', _id: -1 }).limit(1);
                 newGroupModel.projectId = project._id;
@@ -48,15 +43,16 @@ export default async function handler(
                 res.statusCode = 201;
                 res.end(JSON.stringify({ message: 'Group Created', data: [group] }));
                 break;
-            } catch (error) {
-                //console.error(error);
+            } catch (err) {
                 res.statusCode = 400;
-                res.end(JSON.stringify({ message: 'Group Failed to Post. ' + error }));
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                res.end(JSON.stringify({ message: errorMessage, errors: err }) || JSON.stringify({ message: 'Task Failed to Post' }));
+                //res.end(JSON.stringify({ message: 'Task Failed to Post' }));
                 break;
-            }     
+            }
         default:
-                res.statusCode = 400;
-                res.end(JSON.stringify({ message: 'Error: Group Failed'}));
-                break;
+            res.statusCode = 400;
+            res.end(JSON.stringify({ message: 'Error: Task Failed' }));
+            break;
     }
 }
