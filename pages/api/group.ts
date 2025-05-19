@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../libs/db';
 import Group from '../../models/group';
-import Project from '../../models/project';
 import { GroupModelType } from '../../models/group';
 //import slugify from 'slugify';
 
@@ -35,9 +34,11 @@ export default async function handler(
             try {
                 const newGroupModel: GroupModelType = new Group(req.body);
                 // put a legit projectId here
-                const project = await Project.findOne().sort({ field: 'asc', _id: -1 }).limit(1);
-                newGroupModel.projectId = project._id;
-                // temp until Projects are chosen in form.
+                if (!newGroupModel.projectId) {
+                    res.statusCode = 400;
+                    res.end(JSON.stringify({ message: 'ProjectId is required' }));
+                    break;
+                }
                 const group = await Group.create(newGroupModel);
                 //console.log('Group Created: ' + JSON.stringify(group));
                 res.statusCode = 201;

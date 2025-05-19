@@ -6,19 +6,23 @@ import { cn } from '../utils/clsxtw';
 import { Button, Divider, Select, SelectItem } from '@heroui/react';
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 import AddProject from '../components/forms/addproject';
+import mongoose from "mongoose";
 
 interface FormMap {
   type: string;
   component: React.ReactNode;
 }
-const formMap: FormMap[] = [
+interface SidebarRightProps {
+    projectId: mongoose.Types.ObjectId;
+}
+const getFormMap = (projectId: mongoose.Types.ObjectId): FormMap[] => [
   {
     type: 'project',
     component: <AddProject />,
   },
   {
     type: 'group',
-    component: <AddGroup />,
+    component: <AddGroup projectId={projectId} />,
   },
   {
     type: 'task',
@@ -26,7 +30,7 @@ const formMap: FormMap[] = [
   },
 ];
 
-const SidebarRight: React.FC = () => {
+const SidebarRight: React.FC<SidebarRightProps> = ( {projectId} ) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
         if (typeof window !== 'undefined') {
           const saved = window.localStorage.getItem('sidebarExpanded');
@@ -36,6 +40,7 @@ const SidebarRight: React.FC = () => {
           return true; // default value if window is not defined
       });
       const [selectedForm, setSelectedForm] = useState('project');
+      const formMap = getFormMap(projectId);
       useEffect(() => {
         console.log('Selected form:', selectedForm);
       }, [selectedForm]);
@@ -73,7 +78,7 @@ const SidebarRight: React.FC = () => {
             onChange={handleSelectChange}
             >
               {formMap.map((form) => (
-                <SelectItem key={form.type} value={form.type}>
+                <SelectItem key={form.type} data-value={form.type}>
                   {form.type.charAt(0).toUpperCase() + form.type.slice(1)}
                 </SelectItem>
               ))}

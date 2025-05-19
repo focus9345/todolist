@@ -18,15 +18,20 @@ interface GroupTypeProps {
 // }
 
 const Group: React.FC<GroupTypeProps> = ({ group }) => {
+  //const dataTaskGroup = `tasks_${String(group._id)}`;
 
-  const groupId = String(group._id);
+  
+  const groupId = String(group._id)
   const {
     data,
     isLoading,
     isError,
   } = useTasksData(groupId);
 
-  const tasks = data as TaskModelType[];
+
+  // Issue when calling the API hook its not getting new tasks or clearing tasks if group ID is different
+  // Filter tasks by group ID insurance
+   const tasks = data?.filter((task) => String(task.groupId) === groupId) as TaskModelType[];
 
   if (isLoading) {
     return <LoadingSpinner label="Loading Tasks..." />;

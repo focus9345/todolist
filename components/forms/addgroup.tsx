@@ -7,6 +7,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "../../utils/clsxtw";
 import { FormState } from "../../types/types";
 import { GroupModelType } from "../../models/group";
+import mongoose from "mongoose";
+//import { useProjectsData } from "../../hooks/projects";
+//import { useGroupsData } from "../../hooks/groups";
 
 /**
  * Component will add a new group.
@@ -18,6 +21,9 @@ const initialState: FormState = {
   errors: {},
   isError: false,
 };
+interface SidebarRightProps {
+    projectId: mongoose.Types.ObjectId;
+}
 // Server Form Action
 async function groupServerAction(
   prevState: FormState,
@@ -30,7 +36,11 @@ async function groupServerAction(
   )) || { message: "", errors: {}, isError: false };
   return formDataEntries;
 }
-const AddGroup: React.FC = () => {
+const AddGroup: React.FC<SidebarRightProps> = ({projectId}) => {
+  
+  //const groupData = useGroupsData(String(projectId)).data;
+
+
   const formRef = useRef<HTMLFormElement>(null);
   //REMOVE const [state, formAction] = useActionState<FormState, FormData>(groupAction, initialState);
   const [errors, setErrors] = React.useState<FormState["errors"]>({});
@@ -80,6 +90,7 @@ const AddGroup: React.FC = () => {
       const formData = new FormData(event.currentTarget);
       // Append the type to the form data
       formData.append("type", "group");
+      formData.append("projectId", String(projectId));
       try {
         // Call the server action to handle the form submission
         await groupMutation.mutateAsync(formData);
@@ -99,7 +110,6 @@ const AddGroup: React.FC = () => {
       }
     }
   };
-
   React.useEffect(() => {
     if (groupMutation.data) {
       console.log("Group Mutation Data: ", groupMutation.data.errors);
@@ -108,6 +118,8 @@ const AddGroup: React.FC = () => {
       }));
     }
   }, [groupMutation.data]);
+
+  console.log("group IDs", )
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
       <h3 className="text-sm pb-2 font-semibold">Add a New Group</h3>

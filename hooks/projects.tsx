@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ProjectModelType } from "../models/project";
 import BASE_URL from "../utils/baseurl";
 
+// Might be better to get projects, groups and tasks in one go here 
 const fetchProjects = async (): Promise<ProjectModelType[]> => {
     const response = await fetch(BASE_URL + "/api/project", {
       method: "GET",
