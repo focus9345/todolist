@@ -9,7 +9,13 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import SidebarRight from "../../../../layouts/sidebarright";
 
+/* This component displays a single project and its associated groups.
+ * It fetches project data using a custom hook and displays the project title,
+ * along with a grid of groups related to that project.
+ * TODO: Jest Unit Testing needed
+*/
 const Project: React.FC = () => {
+  //! Issue: Data is not being seperated per each project.
   const { data, isLoading, isError } = useProjectsData();
   const params = useParams();
   const slug =

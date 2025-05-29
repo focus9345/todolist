@@ -12,9 +12,12 @@ import mongoose from "mongoose";
 //import { useGroupsData } from "../../hooks/groups";
 
 /**
- * Component will add a new group.
- *
- *
+ * Add Group Component
+ * * This component is used to add a new group to the project.
+ * TODO: Add a way to add multiple groups at once
+ * TODO: Split form messages and errors into new component
+ * @component 
+ * @param {string} projectId - The ID of the project to which the group belongs.
  */
 const initialState: FormState = {
   message: "",
@@ -37,12 +40,7 @@ async function groupServerAction(
   return formDataEntries;
 }
 const AddGroup: React.FC<SidebarRightProps> = ({projectId}) => {
-  
-  //const groupData = useGroupsData(String(projectId)).data;
-
-
   const formRef = useRef<HTMLFormElement>(null);
-  //REMOVE const [state, formAction] = useActionState<FormState, FormData>(groupAction, initialState);
   const [errors, setErrors] = React.useState<FormState["errors"]>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isActive, setIsActive] = React.useState(true);

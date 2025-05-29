@@ -1,14 +1,14 @@
 'use client';
-import React, { useEffect } from "react";
+import React from "react";
 import Group from "./group";
 import LoadingSpinner from "../../layouts/loading";
 import { GroupModelType } from "../../models/group";
 import { useGroupsData } from "../../hooks/groups";
 import mongoose from "mongoose";
-import { useQueryClient } from "@tanstack/react-query";
+//import { useQueryClient } from "@tanstack/react-query";
 /**
  * Container for many groups.
- *
+ * 
  *
  */
 interface GroupsGridProps {
@@ -16,7 +16,7 @@ interface GroupsGridProps {
 }
 
 const GroupsGrid: React.FC<GroupsGridProps> = ({ projectId }) => {
-  const queryClient = useQueryClient();
+  //const queryClient = useQueryClient();
   const {
     data,
     isLoading,
@@ -24,17 +24,27 @@ const GroupsGrid: React.FC<GroupsGridProps> = ({ projectId }) => {
   } = useGroupsData(String(projectId));
   const groups: GroupModelType[] | null = Array.isArray(data) ? data as GroupModelType[] : null;
 
+  // const modifiedGroups = useMemo(() => {
+  //   if (!groups) return [];
+  //   return groups.map((group) => ({
+  //     //! not sure this is what I need to do here
+  //     ...group,
+  //     projectId: String(group.projectId), // Ensure projectId is a string
+  //   }));
+  // });
 
-  useEffect(() => {
+  // console.log("modifiedGroups:\n", modifiedGroups);
+  // useEffect(() => {
 
-    return () => {
-      console.log("Cleaning up GroupsGrid component");
-      queryClient.getQueryData(["groups", projectId]);
-      // queryClient.resetQueries({ queryKey: ["groups", projectId] });
-      // queryCache.invalidateQueries({ queryKey: ["groups", projectId] });
-    };
+  //   return () => {
+  //     console.log("Cleaning up GroupsGrid component");
+  //     queryClient.getQueryData(["groups", projectId]);
+      
+  //     // queryClient.resetQueries({ queryKey: ["groups", projectId] });
+  //     // queryCache.invalidateQueries({ queryKey: ["groups", projectId] });
+  //   };
     
-  }, [ projectId, queryClient]);
+  // }, [ projectId, queryClient]);
 
 //   groups?.map((group => {
 //     console.log("Group projectID:", group.projectId);

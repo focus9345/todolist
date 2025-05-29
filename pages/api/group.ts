@@ -20,7 +20,8 @@ export default async function handler(
     switch (method) {
         case 'GET':
             try {
-                const groups = await Group.find({});
+                const { projectId } = req.query;
+                const groups = await Group.find({ 'projectId': projectId });
                 res.statusCode = 200;
                 res.end(JSON.stringify({ message: 'Group Found', data: groups }));
                 break;

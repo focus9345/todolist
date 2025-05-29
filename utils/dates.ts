@@ -8,16 +8,19 @@ import {
 import { useDateFormatter } from "@react-aria/i18n";
 
 /*
-    * @module utils/dates
-    * @requires react
-    * @requires internationalized/date
-    * @requires react-aria/i18n
-    */
-// Dev Note: I think this might return the Server Time, not the clients time.
+ * @module utils/dates
+* @requires react
+* @requires internationalized/date
+* @requires react-aria/i18n
+* TODO: consider using  closures and higher order functions to create a more functional approach
+* TODO: simplify the error handling and validation 
+*/
+//! Dev Note: I think this might return the Server Time, not the clients time.
 // validate the date object or string specific for HeroUI 
 // see documentation: https://www.heroui.com/docs/components/date-input
 // see internationalized: https://react-spectrum.adobe.com/internationalized/date/CalendarDate.html
 // Calendar Dates must be DateValue
+// This utility should help transforming and validating dates for use with HeroUI components.
 
 const ensureDateStringFormat = (date: string): string => {
     const formattedDate = new Date(date), 
@@ -32,7 +35,6 @@ const ensureDateStringFormat = (date: string): string => {
     }
     return [year, month, day].join("-"); // returns YYYY-MM-DD
 };
-
 
 // This function will validate the date object or string specific for HeroUI
 const isValidateDate = (date: CalendarDate | DateValue | Date): boolean => {
