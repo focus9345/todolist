@@ -4,19 +4,17 @@ import { Form, Input, Textarea, Switch } from "@heroui/react";
 import FormSubmit from "./formsubmit";
 import HandleSubmit from "../../libs/actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cn } from "../../utils/clsxtw";
 import { FormState } from "../../types/types";
 import { GroupModelType } from "../../models/group";
 import mongoose from "mongoose";
-//import { useProjectsData } from "../../hooks/projects";
-//import { useGroupsData } from "../../hooks/groups";
-
+import FormMessage from "./formmessage";
 /**
  * Add Group Component
  * * This component is used to add a new group to the project.
  * TODO: Add a way to add multiple groups at once
  * TODO: Split form messages and errors into new component
- * @component 
+ * TODO - Look into refactoring projects, groups, and tasks into more reusable components.
+ * @component
  * @param {string} projectId - The ID of the project to which the group belongs.
  */
 const initialState: FormState = {
@@ -25,7 +23,7 @@ const initialState: FormState = {
   isError: false,
 };
 interface SidebarRightProps {
-    projectId: mongoose.Types.ObjectId;
+  projectId: mongoose.Types.ObjectId;
 }
 // Server Form Action
 async function groupServerAction(
@@ -39,7 +37,7 @@ async function groupServerAction(
   )) || { message: "", errors: {}, isError: false };
   return formDataEntries;
 }
-const AddGroup: React.FC<SidebarRightProps> = ({projectId}) => {
+const AddGroup: React.FC<SidebarRightProps> = ({ projectId }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = React.useState<FormState["errors"]>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,14 +108,12 @@ const AddGroup: React.FC<SidebarRightProps> = ({projectId}) => {
   };
   React.useEffect(() => {
     if (groupMutation.data) {
-      console.log("Group Mutation Data: ", groupMutation.data.errors);
+      //console.log("Group Mutation Data: ", groupMutation.data.errors);
       setErrors(() => ({
         ...groupMutation.data.errors, // Spread only the errors object
       }));
     }
   }, [groupMutation.data]);
-
-  console.log("group IDs", )
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
       <h3 className="text-sm pb-2 font-semibold">Add a New Group</h3>
@@ -160,33 +156,7 @@ const AddGroup: React.FC<SidebarRightProps> = ({projectId}) => {
           </Switch>
         </div>
         <FormSubmit />
-        {groupMutation.isPending && (
-          <div className="text-center">
-            <p className="text-sm text-gray-500">Creating Group...</p>
-          </div>
-        )}
-        {groupMutation.isError && (
-          <div className="text-center">
-            <p className="text-sm text-red-600">
-              {(groupMutation.error as Error).message}
-            </p>
-          </div>
-        )}
-        {groupMutation.isSuccess && (
-          <div
-            className={cn(
-              groupMutation.data?.isError ? "bg-red-800" : "bg-green-800",
-              "text-center rounded-md my-3 p-2 text-white text-sm w-full"
-            )}
-          >
-            <p className="text-sm">
-              {groupMutation.data?.message
-                ? groupMutation.data.message
-                : "Group Created Successfully!"}{" "}
-            </p>
-            <p></p>
-          </div>
-        )}
+        <FormMessage message={groupMutation} />
       </Form>
     </section>
   );

@@ -31,13 +31,12 @@ const fetchGroups = async (projectId: string): Promise<ProjectModelType[]> => {
         queryKey: ["groups", projectId], // Query key
         queryFn: () => fetchGroups(projectId),
         enabled: !!projectId,
-        staleTime: 1000 * 5, // 5 seconds
+        staleTime: 1000 * 60 * 20, // 20 minutes
         // Only run the query if projectId is defined
         // This prevents the query from running on the initial render
         // and only runs when projectId is available
         // This is useful for dynamic queries
         // and prevents unnecessary network requests
-        // taleTime: 1000 * 60 * 30, // 30 minutes
       });
   }
 

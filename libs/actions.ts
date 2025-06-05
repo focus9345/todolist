@@ -10,7 +10,6 @@ import xss from 'xss';
     * @returns message - string with message
     * @returns isError - boolean with error status
     */
-
 const sanitizeFormData = (formData: FormData): Record<string, string | string[] | boolean | undefined> => {
     const sanitizedData: Record<string, string | string[] | boolean | undefined> = {};
     const formValues = Object.fromEntries(formData);
@@ -42,13 +41,12 @@ const sanitizeFormData = (formData: FormData): Record<string, string | string[] 
     // remove any empty values from the object
     Object.keys(sanitizedData).forEach((key) => {
         if (sanitizedData[key] === '' || sanitizedData[key] === undefined) {
-            console.log('removing key', key, ' sanitizedData[key] ', sanitizedData[key]);
+            //console.log('removing key', key, ' sanitizedData[key] ', sanitizedData[key]);
             delete sanitizedData[key];
         }
     });
     return sanitizedData;
 }
-
 //MAKE THIS A TYPE LATER
 interface PrevState {
     message: string;
@@ -58,13 +56,10 @@ interface PrevState {
 
 const HandleSubmit = (prevState: PrevState, formData: FormData) => {
     const type = formData.get('type');
-
     // remove the type from the form data
-
     formData.delete('type');
     // sanitize the form data
     const formDataEntries = sanitizeFormData(formData);
-
     async function handler(formDataEntries: Record<string, string | boolean | string[] | undefined>) {
         // create a request Init object
         const reqInit: RequestInit = {
@@ -79,7 +74,7 @@ const HandleSubmit = (prevState: PrevState, formData: FormData) => {
         if (!res.ok) {
             const whyFail = await res.json();
             const failMessage: string = whyFail.message ? whyFail.message : 'Error: Failed to Save';
-            console.log('Actions Fail Message: ', failMessage);
+            //console.log('Actions Fail Message: ', failMessage);
             // reformat mongoose errors to fit heroui form validation
             const failErrors: Record<string, string | string[]> = whyFail.errors.errors ? (
                 Object.keys(whyFail.errors.errors).reduce((acc: Record<string, string | string[]>, key: string) => {
@@ -95,14 +90,10 @@ const HandleSubmit = (prevState: PrevState, formData: FormData) => {
         }
         // Get the JSON response
         const response = await res.json();
-
         if (response.message) {
             return { message: response.message, errors: {}, isError: false };
         }
     }
     return handler(formDataEntries);
-
 };
-
-
 export default HandleSubmit;

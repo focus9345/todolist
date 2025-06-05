@@ -4,7 +4,6 @@ import { GroupModelType } from "../../models/group";
 import { TaskModelType } from "../../models/task";
 import { useTasksData } from "../../hooks/tasks";
 import LoadingSpinner from "../../layouts/loading";
-
 /**
  * Groups that will hold tasks for categorization.
  *
@@ -13,14 +12,7 @@ import LoadingSpinner from "../../layouts/loading";
 interface GroupTypeProps {
   group: GroupModelType;
 }
-// interface TasksTypeProps {
-//   grouptask: TaskType[] | undefined;
-// }
-
 const Group: React.FC<GroupTypeProps> = ({ group }) => {
-  //const dataTaskGroup = `tasks_${String(group._id)}`;
-
-  
   const groupId = String(group._id)
   const {
     data,
@@ -28,9 +20,9 @@ const Group: React.FC<GroupTypeProps> = ({ group }) => {
     isError,
   } = useTasksData(groupId);
 
-
   // Issue when calling the API hook its not getting new tasks or clearing tasks if group ID is different
   // Filter tasks by group ID insurance
+  //! Should not need to do this if tanstack query uses group ID
    const tasks = data?.filter((task) => String(task.groupId) === groupId) as TaskModelType[];
 
   if (isLoading) {
@@ -53,9 +45,7 @@ const Group: React.FC<GroupTypeProps> = ({ group }) => {
     <>
     <section className="border border-zinc-500/40 rounded-md grid grid-rows gap-2 px-2 justify-center sm:max-w-[340px] max-w-full">
       <h3 className="text-center text-lg py-1"> {group.title}</h3>
-      
         <Tasks tasks={tasks} />
-        
     </section>
     </>
   );

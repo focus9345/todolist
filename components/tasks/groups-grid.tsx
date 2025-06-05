@@ -14,7 +14,6 @@ import mongoose from "mongoose";
 interface GroupsGridProps {
   projectId: mongoose.Types.ObjectId;
 }
-
 const GroupsGrid: React.FC<GroupsGridProps> = ({ projectId }) => {
   //const queryClient = useQueryClient();
   const {
@@ -23,38 +22,6 @@ const GroupsGrid: React.FC<GroupsGridProps> = ({ projectId }) => {
     isError,
   } = useGroupsData(String(projectId));
   const groups: GroupModelType[] | null = Array.isArray(data) ? data as GroupModelType[] : null;
-
-  // const modifiedGroups = useMemo(() => {
-  //   if (!groups) return [];
-  //   return groups.map((group) => ({
-  //     //! not sure this is what I need to do here
-  //     ...group,
-  //     projectId: String(group.projectId), // Ensure projectId is a string
-  //   }));
-  // });
-
-  // console.log("modifiedGroups:\n", modifiedGroups);
-  // useEffect(() => {
-
-  //   return () => {
-  //     console.log("Cleaning up GroupsGrid component");
-  //     queryClient.getQueryData(["groups", projectId]);
-      
-  //     // queryClient.resetQueries({ queryKey: ["groups", projectId] });
-  //     // queryCache.invalidateQueries({ queryKey: ["groups", projectId] });
-  //   };
-    
-  // }, [ projectId, queryClient]);
-
-//   groups?.map((group => {
-//     console.log("Group projectID:", group.projectId);
-//     console.log("Project Id:", String(projectId));
-
-//     if (group.projectId !== String(projectId)) {
-//       console.log("miss match expecting to invalidate query")
-//       queryClient.resetQueries({ queryKey: ["groups", projectId]});
-//   }
-// }));
 
   if (isLoading) {
     return <LoadingSpinner label="Loading Groups..." />;

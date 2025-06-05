@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../libs/db';
 import Task from '../../models/task';
-import Group from '../../models/group';
+//import Group from '../../models/group';
 import { TaskModelType } from '../../models/task';
 
 type ResponseData = {
@@ -33,9 +33,10 @@ export default async function handler(
         case 'POST':
             try {
                 const newModel = new Task(req.body);
+                console.log('New Task Group ID:', newModel.groupId);
                 // put a legit groupId here
-                const group = await Group.findOne().sort({ field: 'asc', _id: 1 }).limit(1);
-                newModel.groupId = group._id;
+                // const group = await Group.findOne().sort({ field: 'asc', _id: 1 }).limit(1);
+                // newModel.groupId = group._id;
                 // temp until groups are chosen in form.
                 const task = await Task.create(newModel);
                 res.statusCode = 201;

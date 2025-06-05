@@ -15,7 +15,6 @@ import SidebarRight from "../../../../layouts/sidebarright";
  * TODO: Jest Unit Testing needed
 */
 const Project: React.FC = () => {
-  //! Issue: Data is not being seperated per each project.
   const { data, isLoading, isError } = useProjectsData();
   const params = useParams();
   const slug =

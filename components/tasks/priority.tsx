@@ -14,7 +14,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "@heroui/react";
  *
  *
  */
-
 function AssignIcon(priority: TaskPriority) {
   let icon;
   let bgcolor = "bg-primary-300";
@@ -49,7 +48,6 @@ function AssignIcon(priority: TaskPriority) {
     </button>
   );
 }
-
 const Priority: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
   return (
     <>
@@ -63,4 +61,3 @@ const Priority: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
   );
 };
 export default Priority;
-// Compare this snippet from components/tasks/tasklist.tsx:

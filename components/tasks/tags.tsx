@@ -5,13 +5,10 @@ import {Chip} from "@heroui/react";
  * 
  *  
  */
-
 interface TagsProps {
     tags: string[];
 }
-
 const Tags: React.FC<TagsProps> = ({ tags }) => {
-
 return (
     <div className="flex gap-2 flex-wrap justify-center">
         {tags.map((tag, index) => (
@@ -24,4 +21,3 @@ return (
 
 }
 export default Tags;
-// Compare this snippet from components/tasks/tasklist.tsx:

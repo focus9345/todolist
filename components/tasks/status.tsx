@@ -21,7 +21,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "@heroui/react";
  *
  *
  */
-
 function AssignIcon(status: TaskStatus) {
   let icon;
   let bgcolor = "bg-primary-300";
@@ -87,7 +86,6 @@ function AssignIcon(status: TaskStatus) {
     </button>
   );
 }
-
 const Status: React.FC<{ status: TaskStatus }> = ({ status }) => {
   return (
     <>
@@ -101,4 +99,3 @@ const Status: React.FC<{ status: TaskStatus }> = ({ status }) => {
   );
 };
 export default Status;
-// Compare this snippet from components/tasks/tasklist.tsx:

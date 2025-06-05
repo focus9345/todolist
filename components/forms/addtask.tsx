@@ -14,20 +14,24 @@ import HandleSubmit from "../../libs/actions";
 import { DueDateDefault, CreateDate } from "../../utils/dates";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { TaskStatus, TaskPriority, TaskTags, FormState } from "../../types/types";
-import { cn } from "../../utils/clsxtw";
+//import { cn } from "../../utils/clsxtw";
 import { TaskModelType } from "../../models/task";
+import { GroupModelType } from "../../models/group";
+import mongoose from "mongoose";
+import FormMessage from "./formmessage";
 /**
  * Component will add a new task.
- *
- *
+ * TODO - Move initialState to a separate file for better organization.
+ * TODO - Look into refactoring projects, groups, and tasks into more reusable components.
  */
-
-
 const initialState: FormState = {
   message: "", // Ensure message is always a string
   errors: {},
   isError: false,
 };
+interface SidebarRightProps {
+    projectId: mongoose.Types.ObjectId;
+}
 
 // Server Form Action
 async function taskServerAction(
@@ -42,12 +46,19 @@ async function taskServerAction(
   return formDataEntries;
 }
 
-const AddTask: React.FC = () => {
+const AddTask: React.FC<SidebarRightProps> = ({projectId}) => {
   const formRef = useRef<HTMLFormElement>(null);
+  // const [showMessage, setShowMessage] = useState(false);
+  // Initialize state for the due date
   const [valueDueDate, setValueDueDate] = useState<DateValue>(DueDateDefault());
   const [errors, setErrors] = React.useState<FormState["errors"]>(initialState.errors);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
+  // lets get the query data for groups to choose from
+  const groups = queryClient.getQueryData<GroupModelType[]>(["groups", projectId]);
+  console.log("Groups: ", groups);
+
+  // Create a mutation for adding a new task
   const taskMutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const result = await taskServerAction(initialState, formData);
@@ -92,6 +103,7 @@ const AddTask: React.FC = () => {
       const formData = new FormData(event.currentTarget);
       // Append the type to the form data
       formData.append("type", "task");
+
       try {
         // Call the server action to handle the form submission
         await taskMutation.mutateAsync(formData);
@@ -103,7 +115,7 @@ const AddTask: React.FC = () => {
         }
         setTimeout(() => {
           taskMutation.data = initialState;
-        }, 4000);
+        }, 5000);
       } finally {
         setIsSubmitting(false);
         // Reset the form after submission
@@ -115,11 +127,22 @@ const AddTask: React.FC = () => {
   React.useEffect(() => {
       if (taskMutation.data) {
         setErrors(() => ({
- 
           ...taskMutation.data.errors, // Spread only the errors object
         }));
       }
     }, [taskMutation.data]);
+
+    // React.useEffect(() => {
+    //   if (taskMutation.isSuccess) {
+    //     setShowMessage(true);
+    //     const timer = setTimeout(() => {
+    //       setShowMessage(false);
+    //       taskMutation.data = initialState; // Reset the data after showing the message
+    //     }, 6000);
+    //   return () => clearTimeout(timer); // Clean up the timer on unmount
+    //  } 
+    // }
+    // , [taskMutation.isSuccess]);
 
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
@@ -135,8 +158,6 @@ const AddTask: React.FC = () => {
           className="max-w-xs"
           description="Enter a task name"
           isRequired
-          // isInvalid={errors?.title ? true : false}
-          // errorMessage={`${errors?.title}`}
           label="Task Name"
           labelPlacement="inside"
           name="title"
@@ -153,6 +174,22 @@ const AddTask: React.FC = () => {
           size="sm"
           variant="faded"
         />
+        <Select
+          className="max-w-xs"
+          label="Group"
+          labelPlacement="inside"
+          name="groupId"
+          selectionMode="single"
+          isRequired
+        >
+          {Object.values(groups ?? []).map((group) => (
+            <SelectItem 
+              key={group._id.toString()}>
+
+              {group.title}
+            </SelectItem>
+          ))}
+        </Select>
         <Select
           className="max-w-xs"
           label="Set Status"
@@ -226,8 +263,9 @@ const AddTask: React.FC = () => {
         />
 
         <FormSubmit />
+        <FormMessage message={taskMutation} />
 
-        {taskMutation.isPending && (
+        {/* {taskMutation.isPending && (
           <div className="text-center">
             <p className="text-sm text-gray-500">Creating Task...</p>
           </div>
@@ -253,7 +291,7 @@ const AddTask: React.FC = () => {
                 <p>
             </p>
           </div>
-        )}
+        )} */}
         
       </Form>
     </section>

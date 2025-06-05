@@ -5,13 +5,14 @@ import { Form, Input, Textarea, Switch } from "@heroui/react";
 import FormSubmit from "./formsubmit";
 import HandleSubmit from "../../libs/actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cn } from "../../utils/clsxtw";
 import { ProjectModelType } from "../../models/project";
 import { FormState } from "../../types/types";
+import FormMessage from "./formmessage";
+
 
 /**
  * Component will add a new project.
- *
+ * TODO - Look into refactoring projects, groups, and tasks into more reusable components.
  *
  */
 
@@ -118,42 +119,6 @@ const AddProject: React.FC = () => {
   }, [projectMutation.data]);
   
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // const handleSubmit = async (formData: FormData, pathname: string | null) => {
-    
-  //   // tell the handler what type of form it is
-  //   formData.append("type", "project");
-  //   formData.append("pathname", pathname ?? "");
-    
-  //   await dispatch(formData);
-  //   //router.refresh(); // not working :()
-  //   //revalidatePath(`${pathname}`, 'page');
-  //   //redirect(`${pathname}`);
-  // };
-
-  // React.useEffect(() => {
-  //   if (state.errors) {
-  //     Object.keys(state.errors).forEach((key) => {
-  //       setErrors((prev: any) => ({
-  //         ...prev,
-  //         [key]: state.errors[key].message,
-  //       }));
-  //     });
-  //   }
-  // }, [state.errors]);
-
   return (
     <section className="mt-6 p-6 border border-zinc-700 rounded-md">
       <h3 className="text-sm pb-2 font-semibold">Add a New Project</h3>
@@ -200,33 +165,8 @@ const AddProject: React.FC = () => {
         </div>
         
         <FormSubmit />
-        {projectMutation.isPending && (
-                  <div className="text-center">
-                    <p className="text-sm text-gray-500">Creating Group...</p>
-                  </div>
-                )}
-                {projectMutation.isError && (
-                  <div className="text-center">
-                    <p className="text-sm text-red-600">
-                      {(projectMutation.error as Error).message}
-                    </p>
-                  </div>
-                )}
-                {projectMutation.isSuccess && (
-                  <div
-                    className={cn(
-                      projectMutation.data?.isError ? "bg-red-800" : "bg-green-800",
-                      "text-center rounded-md my-3 p-2 text-white text-sm w-full"
-                    )}
-                  >
-                    <p className="text-sm">
-                      {projectMutation.data?.message
-                        ? projectMutation.data.message
-                        : "Group Created Successfully!"}{" "}
-                    </p>
-                    <p></p>
-                  </div>
-                )}
+        <FormMessage message={projectMutation} />
+
       </Form>
     </section>
   );
